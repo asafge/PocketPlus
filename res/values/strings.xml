@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<resources>
+    
+    <string name="app_name">Pocket+</string>
+    
+    <!-- Extension -->
+    <string name="extension_name">Pocket+</string>
+    <string name="extension_description">News+ extension for the Pocket service.</string>
+    <string name="extension_settings_title">Settings</string>
+    <string name="extension_login_title">Login</string>
+    <string name="Extension_login_username">Username</string>
+    <string name="Extension_login_password">Password</string>
+    
+    <string name="msg_login_running">Login…</string>
+    <string name="msg_login_fail">Login failed. Please try again.</string>
+    
+	<string name="login_welcome">Please login to Pocket to continue:</string>
+    
+    <!-- err -->
+    <string name="err_io">Network error</string>
+    
+</resources>
