@@ -44,9 +44,8 @@ public class APICall {
 	private void createCallback(String url, Context c) {
 		callbackUrl = url;
 		callback = new AjaxCallback<JSONObject>();
-		callback.header("User-Agent", Prefs.USER_AGENT);
-		String[] sessionID = Prefs.getSessionID(c);
-		callback.cookie(sessionID[0], sessionID[1]);
+		callback.header("Content-Type", "application/x-www-form-urlencoded; charset=UTF8");
+        callback.header("X-Accept", "application/json");
 		callback.url(callbackUrl).type(JSONObject.class);
 	}
 	
@@ -132,9 +131,13 @@ public class APICall {
 	}
 	
 	// API constants
-	public static String API_URL_BASE = "http://www.newsblur.com/";
-	public static String API_URL_BASE_SECURE = "https://www.newsblur.com/";
-	public static String API_URL_LOGIN = API_URL_BASE_SECURE + "api/login/";
+    public static String API_OAUTH_CONSUMER_KEY = "16932-b0d065023261f24a7fa5ffcd";
+    public static String API_OAUTH_REDIRECT = "about:blank;";
+
+
+	public static String API_URL_BASE = "http://www.getpocket.com/";
+	public static String API_URL_BASE_SECURE = "https://www.getpocket.com/";
+	public static String API_URL_LOGIN = API_URL_BASE_SECURE + "v3/oauth/request";
 	
 	public static String API_URL_FOLDERS_AND_FEEDS = API_URL_BASE + "reader/feeds?flat=true";
 	public static String API_URL_UNREAD_HASHES = API_URL_BASE + "reader/unread_story_hashes/";
