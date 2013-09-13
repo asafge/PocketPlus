@@ -8,10 +8,12 @@ import org.json.JSONObject;
 
 import android.content.Context;
 import android.net.Uri;
+import android.util.Log;
 
 import com.androidquery.AQuery;
 import com.androidquery.callback.AjaxCallback;
 import com.androidquery.callback.AjaxStatus;
+import com.noinnion.android.reader.api.ReaderException;
 
 public class APICall {
 	
@@ -32,7 +34,6 @@ public class APICall {
 	private AjaxCallback<JSONObject> callback;
 	private AQuery aquery;
 	private String callbackUrl;
-	private int retries = 2;
 	
 	// Constructor
 	public APICall(String url,  Context c) {
@@ -44,9 +45,12 @@ public class APICall {
 	private void createCallback(String url, Context c) {
 		callbackUrl = url;
 		callback = new AjaxCallback<JSONObject>();
-		callback.header("Content-Type", "application/x-www-form-urlencoded; charset=UTF8");
-        callback.header("X-Accept", "application/json");
+		callback.header("User-Agent", Prefs.USER_AGENT);
+		callback.header("Accept-Encoding", "gzip");
+		//String sessionID = Prefs.getSessionData(c);
 		callback.url(callbackUrl).type(JSONObject.class);
+		callback.timeout(5000);
+		callback.retry(3);
 	}
 	
 	// Add a Post parameter to this call
@@ -87,47 +91,39 @@ public class APICall {
 	}
 	
 	// Run synchronous HTTP request and check for valid response
-	public boolean sync() {
+	public void sync() throws ReaderException {
 		if (callback == null)
-			return false;
+			return;
 		try {		
 			addAllParams();
 			aquery.sync(callback);
 			Json = callback.getResult();
 			Status = callback.getStatus();
 			if (Json == null) {
-				if (retries == 0)
-					return false;
-				else {
-					Thread.sleep(500);
-					retries--;
-					return this.sync();
-				}
+				Log.e("NewsBlur+ Debug", "URL: " + callbackUrl);
+				Log.e("NewsBlur+ Debug", "Status: " + Status.getMessage() + " | " + String.valueOf(Status.getCode()));
+				Log.e("NewsBlur+ Debug", "Session ID: " + Prefs.getSessionData(aquery.getContext()));
+				throw new ReaderException("NewsBlur server unreachable");
 			}
-			if (Json.getString("authenticated") != "true") {
-				// TODO: LoginActivity.logout();
-				return false;
-			}
-			return (Status.getCode() == 200);
+			if ((!Json.getString("authenticated").startsWith("true")) || (Status.getCode() != 200))
+				throw new ReaderException("User not authenticated");
 		}
 		catch (JSONException e) {
-			return false;
-		}
-		catch (InterruptedException e) {
-			return false;
+			Log.e("NewsBlur+ Debug", "JSON Object: " + Json.toString());
+			throw new ReaderException("Unknown API response");
 		}
 	}
 	
 	// Run synchronous HTTP request, check valid response + successful operation 
-	public boolean syncGetBool() {
-		boolean result = true;
+	public boolean syncGetResultOk() throws ReaderException {
 		try {
-			result = (this.sync() && this.Json.getString("result").startsWith("ok"));
+			sync();
+			return this.Json.getString("result").startsWith("ok");
 		} 
 		catch (JSONException e) {
-			result = false;
-		}
-		return result;
+			Log.e("NewsBlur+ Debug", "JSON Object: " + Json.toString());
+			throw new ReaderException("Unknown API response");
+		}		
 	}
 	
 	// API constants
@@ -140,16 +136,17 @@ public class APICall {
 	public static String API_URL_LOGIN = API_URL_BASE_SECURE + "v3/oauth/request";
 	
 	public static String API_URL_FOLDERS_AND_FEEDS = API_URL_BASE + "reader/feeds?flat=true";
-	public static String API_URL_UNREAD_HASHES = API_URL_BASE + "reader/unread_story_hashes/";
+	public static String API_URL_UNREAD_HASHES = API_URL_BASE + "reader/unread_story_hashes";
 	public static String API_URL_RIVER = API_URL_BASE + "reader/river_stories";
 	public static String API_URL_REFRESH_FEEDS = API_URL_BASE + "reader/refresh_feeds/";
 	
-	public static String API_URL_MARK_STORY_AS_READ = API_URL_BASE + "reader/mark_story_as_read/";
+	public static String API_URL_MARK_STORY_AS_READ = API_URL_BASE + "reader/mark_story_hashes_as_read/";
 	public static String API_URL_MARK_STORY_AS_UNREAD = API_URL_BASE + "reader/mark_story_as_unread/";
 	public static String API_URL_MARK_FEED_AS_READ = API_URL_BASE + "reader/mark_feed_as_read";
 	public static String API_URL_MARK_ALL_AS_READ = API_URL_BASE + "reader/mark_all_as_read/";
 	
 	public static String API_URL_STARRED_HASHES = API_URL_BASE + "reader/starred_story_hashes";
+	public static String API_URL_STARRED_STORIES = API_URL_BASE + "reader/starred_stories";
 	public static String API_URL_MARK_STORY_AS_STARRED = API_URL_BASE + "reader/mark_story_as_starred/";
 	public static String API_URL_MARK_STORY_AS_UNSTARRED = API_URL_BASE + "reader/mark_story_as_unstarred/";
 	

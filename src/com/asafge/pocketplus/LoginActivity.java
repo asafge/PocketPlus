@@ -1,5 +1,7 @@
 package com.asafge.pocketplus;
 
+import org.json.JSONObject;
+
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -22,7 +24,7 @@ public class LoginActivity extends Activity {
 		String action = getIntent().getAction();
 		if (action != null && action.equals(ReaderExtension.ACTION_LOGOUT)) {
 			Prefs.setLoggedIn(c, false);
-			Prefs.setSessionID(c, "", "");
+			//Prefs.setSessionData(c, JSONObject);
 			setResult(ReaderExtension.RESULT_LOGOUT);
 			finish();
 		}
