@@ -100,16 +100,16 @@ public class APICall {
 			Json = callback.getResult();
 			Status = callback.getStatus();
 			if (Json == null) {
-				Log.e("NewsBlur+ Debug", "URL: " + callbackUrl);
-				Log.e("NewsBlur+ Debug", "Status: " + Status.getMessage() + " | " + String.valueOf(Status.getCode()));
-				Log.e("NewsBlur+ Debug", "Session ID: " + Prefs.getSessionData(aquery.getContext()));
-				throw new ReaderException("NewsBlur server unreachable");
+				Log.e("Pocket+ Debug", "URL: " + callbackUrl);
+				Log.e("Pocket+ Debug", "Status: " + Status.getMessage() + " | " + String.valueOf(Status.getCode()));
+				Log.e("Pocket+ Debug", "Session ID: " + Prefs.getSessionData(aquery.getContext()));
+				throw new ReaderException("Pocket server unreachable");
 			}
 			if ((!Json.getString("authenticated").startsWith("true")) || (Status.getCode() != 200))
 				throw new ReaderException("User not authenticated");
 		}
 		catch (JSONException e) {
-			Log.e("NewsBlur+ Debug", "JSON Object: " + Json.toString());
+			Log.e("Pocket+ Debug", "JSON Object: " + Json.toString());
 			throw new ReaderException("Unknown API response");
 		}
 	}
@@ -121,7 +121,7 @@ public class APICall {
 			return this.Json.getString("result").startsWith("ok");
 		} 
 		catch (JSONException e) {
-			Log.e("NewsBlur+ Debug", "JSON Object: " + Json.toString());
+			Log.e("Pocket+ Debug", "JSON Object: " + Json.toString());
 			throw new ReaderException("Unknown API response");
 		}		
 	}

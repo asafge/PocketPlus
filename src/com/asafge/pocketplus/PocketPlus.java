@@ -2,7 +2,6 @@ package com.asafge.pocketplus;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import org.json.JSONArray;
@@ -13,12 +12,11 @@ import android.content.Context;
 import android.os.RemoteException;
 import android.util.Log;
 
-import com.asafge.newsblurplus.APICall;
-import com.asafge.newsblurplus.APIHelper;
-import com.asafge.newsblurplus.Prefs;
-import com.asafge.newsblurplus.RotateQueue;
-import com.asafge.newsblurplus.StarredTag;
-import com.asafge.newsblurplus.SubsStruct;
+import com.asafge.pocketplus.APICall;
+import com.asafge.pocketplus.APIHelper;
+import com.asafge.pocketplus.Prefs;
+import com.asafge.pocketplus.RotateQueue;
+import com.asafge.pocketplus.StarredTag;
 import com.noinnion.android.reader.api.ReaderException;
 import com.noinnion.android.reader.api.ReaderExtension;
 import com.noinnion.android.reader.api.internal.IItemIdListHandler;
@@ -26,7 +24,6 @@ import com.noinnion.android.reader.api.internal.IItemListHandler;
 import com.noinnion.android.reader.api.internal.ISubscriptionListHandler;
 import com.noinnion.android.reader.api.internal.ITagListHandler;
 import com.noinnion.android.reader.api.provider.IItem;
-import com.noinnion.android.reader.api.provider.ISubscription;
 
 public class PocketPlus extends ReaderExtension {
 	private Context c;
@@ -63,12 +60,10 @@ public class PocketPlus extends ReaderExtension {
 				handler.items(APIHelper.getStarredHashes(c, limit, null));
 			else if (uid.startsWith(ReaderExtension.STATE_READING_LIST)) {
 				List<String> hashes = APIHelper.getUnreadHashes(c, limit, null, null);
-				if (SubsStruct.Instance(c).IsPremium)
-					hashes = APIHelper.filterLowIntelligence(hashes, c);
 				handler.items(hashes);
 			}
 			else {
-				Log.e("NewsBlur+ Debug", "Unknown reading state: " + uid);
+				Log.e("Pocket+ Debug", "Unknown reading state: " + uid);
 				throw new ReaderException("Unknown reading state");
 			}
 		}
@@ -99,18 +94,15 @@ public class PocketPlus extends ReaderExtension {
 				hashes = APIHelper.getStarredHashes(c, limit, seenHashes);
 				url = APICall.API_URL_STARRED_STORIES;
 			}
-			else if (uid.startsWith("FEED:")) {
-				hashes = APIHelper.getUnreadHashes(c, limit, Arrays.asList(APIHelper.getFeedIdFromFeedUrl(uid)), seenHashes);
-			}
 			else if (uid.startsWith(ReaderExtension.STATE_READING_LIST)) {
 				List<String> unread_hashes = APIHelper.getUnreadHashes(c, limit, null, seenHashes);
 				hashes =  new ArrayList<String>();
-				for (String h : unread_hashes)
+				/*for (String h : unread_hashes)
 					if (!handler.excludedStreams().contains(APIHelper.getFeedUrlFromFeedId(h)))
-						hashes.add(h);
+						hashes.add(h);*/
 			}
 			else {
-				Log.e("NewsBlur+ Debug", "Unknown reading state: " + uid);
+				Log.e("Pocket+ Debug", "Unknown reading state: " + uid);
 				throw new ReaderException("Unknown reading state");
 			}
 				
@@ -175,10 +167,11 @@ public class PocketPlus extends ReaderExtension {
 	/*
 	 * Main function for marking stories (and their feeds) as read/unread.
 	 */
-	private boolean markAs(boolean read, String[]  itemUids, String[]  subUIds)	{	
+	private boolean markAs(boolean read, String[]  itemUids, String[]  subUIds) throws ReaderException	{	
 		APICall ac;
 		if (itemUids == null && subUIds == null) {
 			ac = new APICall(APICall.API_URL_MARK_ALL_AS_READ, c);
+			return ac.syncGetResultOk();
 		}
 		else {
 			if (itemUids != null) {
@@ -187,16 +180,17 @@ public class PocketPlus extends ReaderExtension {
 				for (int i=0; i<itemUids.length; i++) {
 					ac.addPostParam("story_id", itemUids[i]);
 				}
+				return ac.syncGetResultOk();
 			}
 		}
-		return ac.syncGetResultOk();
+		return false;
 	}
 
 	/* 
 	 * Mark a list of stories (and their feeds) as read
 	 */
 	@Override
-	public boolean markAsRead(String[]  itemUids, String[]  subUIds) {
+	public boolean markAsRead(String[]  itemUids, String[]  subUIds) throws ReaderException {
 		return this.markAs(true, itemUids, subUIds);
 	}
 
@@ -204,7 +198,7 @@ public class PocketPlus extends ReaderExtension {
 	 * Mark a list of stories (and their feeds) as unread
 	 */
 	@Override
-	public boolean markAsUnread(String[]  itemUids, String[]  subUids, boolean keepUnread) {
+	public boolean markAsUnread(String[]  itemUids, String[]  subUids, boolean keepUnread) throws ReaderException {
 		return this.markAs(false, itemUids, subUids);
 	}
 
@@ -214,12 +208,7 @@ public class PocketPlus extends ReaderExtension {
 	 */
 	@Override
 	public boolean markAllAsRead(String arg0, String arg1, String[] arg2, long arg3) throws IOException, ReaderException {
-		try {
-			return false;
-		}
-		catch (JSONException e) {
-			return false;
-		}
+		return false;
 	}
 
 	/*

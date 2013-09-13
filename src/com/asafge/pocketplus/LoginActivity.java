@@ -1,7 +1,5 @@
 package com.asafge.pocketplus;
 
-import org.json.JSONObject;
-
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -9,6 +7,8 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.widget.Toast;
 
+import com.asafge.pocketplus.Prefs;
+import com.noinnion.android.reader.api.ReaderException;
 import com.noinnion.android.reader.api.ReaderExtension;
 
 public class LoginActivity extends Activity {
@@ -47,12 +47,14 @@ public class LoginActivity extends Activity {
 			ac.addPostParam("consumer_key", key);
 			ac.addPostParam("redirect_uri", redirect_uri);
 
-			if (ac.sync()) {
+			try {
+				ac.sync();
 				Prefs.setSessionData(c, ac.Json);
-				//Prefs.setLoggedIn(c, true);
+				Prefs.setLoggedIn(c, true);
+				setResult(ReaderExtension.RESULT_LOGIN);
 				return true;
 			}
-			else {
+			catch (ReaderException e) {
 				Prefs.setLoggedIn(c, false);
 				return false;
 			}
@@ -76,15 +78,17 @@ public class LoginActivity extends Activity {
             ac.addPostParam("consumer_key", key);
             ac.addPostParam("redirect_uri", redirect_uri);
 
-            if (ac.sync()) {
-                Prefs.setSessionData(c, ac.Json);
-                //Prefs.setLoggedIn(c, true);
-                return true;
-            }
-            else {
-                Prefs.setLoggedIn(c, false);
-                return false;
-            }
+			try {
+				ac.sync();
+				Prefs.setSessionData(c, ac.Json);
+				Prefs.setLoggedIn(c, true);
+				setResult(ReaderExtension.RESULT_LOGIN);
+				return true;
+			}
+			catch (ReaderException e) {
+				Prefs.setLoggedIn(c, false);
+				return false;
+			}
         }
 
         // On callback - show toast if failed / go to main screen
