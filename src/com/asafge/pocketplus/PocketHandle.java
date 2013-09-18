@@ -43,12 +43,12 @@ public class PocketHandle extends AccountHandle{
 	private String token;
 	private String secret;
 	
-	public PocketHandle(Activity act, String consumerKey, String consumerSecret) {
+	public PocketHandle(Activity act, String consumerKey) {
 		this.act = act;
 		
-		consumer = new CommonsHttpOAuthConsumer(consumerKey, consumerSecret);
-		token = fetchToken(TW_TOKEN);
-		secret = fetchToken(TW_SECRET);
+		consumer = new CommonsHttpOAuthConsumer(consumerKey, "");
+		token = fetchToken(POCKET_TOKEN);
+		secret = fetchToken(POCKET_SECRET);
 		
 		if(token != null && secret != null)
 			consumer.setTokenWithSecret(token, secret);
@@ -155,8 +155,8 @@ public class PocketHandle extends AccountHandle{
 		
 	}
 	
-	private static final String TW_TOKEN = "aq.tw.token";
-	private static final String TW_SECRET = "aq.tw.secret";
+	private static final String POCKET_TOKEN = "aq.pocket.token";
+	private static final String POCKET_SECRET = "aq.pocket.secret";
 	
 	private String fetchToken(String key){
 		return PreferenceManager.getDefaultSharedPreferences(act).getString(key, null);	
@@ -200,7 +200,7 @@ public class PocketHandle extends AccountHandle{
 				AQUtility.debug("token", token);
 				AQUtility.debug("secret", secret);
 				
-				storeToken(TW_TOKEN, token, TW_SECRET, secret);
+				storeToken(POCKET_TOKEN, token, POCKET_SECRET, secret);
 				
 				dismiss();
 				success(act);
@@ -288,7 +288,7 @@ public class PocketHandle extends AccountHandle{
 		
 		token = null;
 		secret = null;
-		storeToken(TW_TOKEN, null, TW_SECRET, null);
+		storeToken(POCKET_TOKEN, null, POCKET_SECRET, null);
 		
 		Task task = new Task();
 		task.cb = cb;
@@ -342,7 +342,7 @@ public class PocketHandle extends AccountHandle{
 		CookieSyncManager.createInstance(act);
 		CookieManager.getInstance().removeAllCookie();		
 		
-		storeToken(TW_TOKEN, null, TW_SECRET, null);
+		storeToken(POCKET_TOKEN, null, POCKET_SECRET, null);
 	}
 	
 }
