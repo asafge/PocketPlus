@@ -33,8 +33,8 @@ public class PocketHandle extends AccountHandle{
 	private static final String OAUTH_REQUEST_TOKEN = "https://getpocket.com/v3/oauth/request";
 	private static final String OAUTH_ACCESS_TOKEN = "https://getpocket.com/v3/oauth/authorize";
 	private static final String OAUTH_AUTHORIZE = "https://getpocket.com/v3/oauth/authorize";
-	private static final String CALLBACK_URI = "twitter://callback";
-	private static final String CANCEL_URI = "twitter://cancel";
+	private static final String CALLBACK_URI = "pocket://callback";
+	private static final String CANCEL_URI = "pocket://cancel";
 	
 	private Activity act;
 	private WebDialog dialog;
@@ -108,7 +108,7 @@ public class PocketHandle extends AccountHandle{
 		protected void onPostExecute(String url) {
 			
 			if(url != null) {
-				dialog = new WebDialog(act, url, new TwWebViewClient());		
+				dialog = new WebDialog(act, url, new PocketWebViewClient());		
 				dialog.setOnCancelListener(this);			
 				show();		
 				dialog.load();
@@ -196,7 +196,7 @@ public class PocketHandle extends AccountHandle{
 		}
 	}
 	
-	private class TwWebViewClient extends WebViewClient {
+	private class PocketWebViewClient extends WebViewClient {
 		
 		private boolean checkDone(String url) {
 			if(url.startsWith(CALLBACK_URI)) {
