@@ -24,8 +24,6 @@ public class APIHelper {
 			List<String> hashes = new ArrayList<String>();
 
 			APICall ac = new APICall(APICall.API_URL_UNREAD_HASHES, c);
-			if (feeds != null) 
-				ac.addGetParams("feed_id", feeds);
 			ac.sync();
 			
 			JSONObject json_feeds = ac.Json.getJSONObject("unread_feed_story_hashes");

@@ -109,7 +109,7 @@ public class PocketPlus extends ReaderExtension {
 			for (int start=0; start < hashes.size(); start += chunk) {
 				APICall ac = new APICall(url, c);
 				int end = (start+chunk < hashes.size()) ? start + chunk : hashes.size();
-				ac.addGetParams("h", hashes.subList(start, end));
+				//ac.addGetParams("h", hashes.subList(start, end));
 				ac.sync();
 				parseItemList(ac.Json, handler, seenHashes);
 			}

@@ -7,7 +7,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.content.Context;
-import android.net.Uri;
 import android.util.Log;
 
 import com.androidquery.AQuery;
@@ -26,7 +25,6 @@ public class APICall {
 		public String Value;
 	}
 
-	private List<Param> params_get = new ArrayList<Param>();
 	private List<Param> params_post = new ArrayList<Param>();
 	
 	public JSONObject Json;
@@ -46,8 +44,8 @@ public class APICall {
 		callbackUrl = url;
 		callback = new AjaxCallback<JSONObject>();
 		callback.header("User-Agent", Prefs.USER_AGENT);
-		callback.header("Accept-Encoding", "gzip");
-		//String sessionID = Prefs.getSessionData(c);
+		callback.header("X-Accept", "application/json");
+		callback.header("Content-Type", "application/x-www-form-urlencoded; charset=UTF8");
 		callback.url(callbackUrl).type(JSONObject.class);
 		callback.timeout(5000);
 		callback.retry(3);
@@ -60,34 +58,11 @@ public class APICall {
 		params_post.add(new Param(key, value));
 		return true;
 	}
-	
-	// Add a Get parameter to this call
-	public boolean addGetParam(String key, String value) {
-		if (callback == null)
-			return false;
-		params_get.add(new Param(key, value));
-		return true;
-	}
-	
-	// Add Get parameters (list) to this call
-	public boolean addGetParams(String key, List<String> values) {
-		if (callback == null)
-			return false;
-		for (String v : values)
-			params_get.add(new Param(key, v));
-		return true;
-	}
-	
+			
 	// Add the Get and Post params to the callback before executing
 	private void addAllParams() {
 		for (Param p: params_post)
 			callback.param(p.Key, p.Value);
-		
-		Uri.Builder b = Uri.parse(callbackUrl).buildUpon();		
-		for (Param p : params_get)
-			b.appendQueryParameter(p.Key, p.Value);	
-		callbackUrl = b.build().toString();
-		callback.url(callbackUrl);
 	}
 	
 	// Run synchronous HTTP request and check for valid response
@@ -96,6 +71,7 @@ public class APICall {
 			return;
 		try {		
 			addAllParams();
+			callback.method(AQuery.METHOD_POST);
 			aquery.sync(callback);
 			Json = callback.getResult();
 			Status = callback.getStatus();
@@ -128,7 +104,7 @@ public class APICall {
 	
 	// API constants
     public static String API_OAUTH_CONSUMER_KEY = "16932-b0d065023261f24a7fa5ffcd";
-    public static String API_OAUTH_REDIRECT = "about:blank;";
+    public static String API_OAUTH_REDIRECT = "pocket://callback;";
 
 
 	public static String API_URL_BASE = "http://www.getpocket.com/";

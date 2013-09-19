@@ -7,9 +7,10 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.widget.Toast;
 
-import com.asafge.pocketplus.Prefs;
 import com.noinnion.android.reader.api.ReaderException;
 import com.noinnion.android.reader.api.ReaderExtension;
+import com.androidquery.AQuery;
+import com.asafge.pocketplus.Prefs;
 
 public class LoginActivity extends Activity {
 	
@@ -33,7 +34,7 @@ public class LoginActivity extends Activity {
 			finish();
 		}
 		else {
-            new GetRequestToken().execute(APICall.API_OAUTH_CONSUMER_KEY, APICall.API_OAUTH_REDIRECT);
+			new GetRequestToken().execute(APICall.API_OAUTH_CONSUMER_KEY, APICall.API_OAUTH_REDIRECT);
 		}
 	}
 	
