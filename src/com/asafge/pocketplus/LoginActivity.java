@@ -1,8 +1,5 @@
 package com.asafge.pocketplus;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
-
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -22,15 +19,16 @@ import com.asafge.pocketplus.Prefs;
 public class LoginActivity extends Activity {
 	
 	protected ProgressDialog mBusy;
-
+	
+	/* 
+	 * Initialize the authentication process
+	 */
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
-		// TODO: Remove code from on create, it causes a loop
 		super.onCreate(savedInstanceState);
-		final Context c = getApplicationContext();
-		setResult(RESULT_CANCELED);	
-		
 		String action = getIntent().getAction();
+		Context c = getApplicationContext();
+		
 		if (action != null && action.equals(ReaderExtension.ACTION_LOGOUT)) {
 			Prefs.setLoggedIn(c, false);
 			Prefs.setSessionData(c, null);
@@ -41,9 +39,57 @@ public class LoginActivity extends Activity {
 			setResult(ReaderExtension.RESULT_LOGIN);
 			finish();
 		}
-		else {
+		if (Prefs.getSessionData(c) == null) {
 			new GetRequestToken().execute(APICall.API_OAUTH_CONSUMER_KEY, APICall.API_OAUTH_REDIRECT);
+			finish();
+		}
+	}
+	
+	/* 
+	 * Callback from Pocket API application approve page
+	 */
+	@Override
+	protected void onResume() {
+		Context c = getApplicationContext();
+		try {
+			super.onResume();
+			new GetAccessToken().execute(APICall.API_OAUTH_CONSUMER_KEY, Prefs.getSessionData(c).getString("code"));
+			finish();
+		}
+		catch (JSONException e) {
+			Prefs.setSessionData(c, null);
+		}
+	}
+	
+	/*
+	 * OAuth step 1 - get request token for Pocket+, for this user.
+	 */
+	private class GetRequestToken extends AsyncTask<String, Void, Boolean> {
+       
+        // Get request token from Pocket API
+		protected Boolean doInBackground(String... params) {
+			Context c = getApplicationContext();
+			APICall ac = new APICall(APICall.API_URL_OAUTH_REQUEST_TOKEN, c);
+			ac.addPostParam("consumer_key", params[0]);
+			ac.addPostParam("redirect_uri", params[1]);
+			
 			try {
+				ac.sync();
+				Prefs.setSessionData(c, ac.Json);
+				setResult(ReaderExtension.RESULT_OK);
+				return true;
+			}
+			catch (ReaderException e) {
+				Prefs.setLoggedIn(c, false);
+				return false;
+			}
+		}
+		
+		// Save request token code
+		protected void onPostExecute(Boolean result) {
+			super.onPostExecute(result);
+			try {
+				Context c = getApplicationContext();
 				JSONObject json = Prefs.getSessionData(c);
 				if (json != null) {
 					Uri.Builder b = Uri.parse(APICall.API_URL_OAUTH_AUTHORIZE_APP).buildUpon();			
@@ -58,38 +104,10 @@ public class LoginActivity extends Activity {
 			}
 		}
 	}
-	
-	@Override
-	protected void onResume() {
-		// TODO: Resume oauth here
-		super.onResume();
-	}
-	
+
 	/*
-	 * OAuth step 1 - get request token for Pocket+, for this user.
+	 * OAuth step 2 - upgrade to access token
 	 */
-	private class GetRequestToken extends AsyncTask<String, Void, Boolean> {
-		protected Boolean doInBackground(String... params) {
-			String key = params[0];
-			String redirect_uri = params[1];
-
-			final Context c = getApplicationContext();
-			APICall ac = new APICall(APICall.API_URL_OAUTH_REQUEST_TOKEN, c);
-			ac.addPostParam("consumer_key", key);
-			ac.addPostParam("redirect_uri", redirect_uri);
-			try {
-				ac.sync();
-				Prefs.setSessionData(c, ac.Json);
-				setResult(ReaderExtension.RESULT_OK);
-				return true;
-			}
-			catch (ReaderException e) {
-				Prefs.setLoggedIn(c, false);
-				return false;
-			}
-		}
-	}
-
     private class GetAccessToken extends AsyncTask<String, Void, Boolean> {
 
         // Show the login... process dialog
@@ -97,16 +115,12 @@ public class LoginActivity extends Activity {
             mBusy = ProgressDialog.show(LoginActivity.this, null, getText(R.string.msg_login_running), true, true);
         }
 
-        // Async call to Pocket API for OAuth request token
+        // Get access token from Pocket API
         protected Boolean doInBackground(String... params) {
-            String key = params[0];
-            String redirect_uri = params[1];
-
-            final Context c = getApplicationContext();
+        	Context c = getApplicationContext();
             APICall ac = new APICall(APICall.API_URL_OAUTH_ACCESS_TOKEN, c);
-            ac.addPostParam("consumer_key", key);
-            ac.addPostParam("redirect_uri", redirect_uri);
-
+            ac.addPostParam("consumer_key", params[0]);
+            ac.addPostParam("code", params[1]);
 			try {
 				ac.sync();
 				Prefs.setSessionData(c, ac.Json);
@@ -115,6 +129,7 @@ public class LoginActivity extends Activity {
 				return true;
 			}
 			catch (ReaderException e) {
+				Prefs.setSessionData(c, null);
 				Prefs.setLoggedIn(c, false);
 				return false;
 			}
@@ -122,13 +137,14 @@ public class LoginActivity extends Activity {
 
         // On callback - show toast if failed / go to main screen
         protected void onPostExecute(Boolean result) {
-            final Context c = getApplicationContext();
+            /*Context c = getApplicationContext();
             if (mBusy != null && mBusy.isShowing())
                 mBusy.dismiss();
             if (result)
                 finish();
             else
                 Toast.makeText(c, getText(R.string.msg_login_fail), Toast.LENGTH_LONG).show();
+                */
         }
     }
 }
