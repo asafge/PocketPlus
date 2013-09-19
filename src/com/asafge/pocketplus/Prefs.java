@@ -2,6 +2,7 @@ package com.asafge.pocketplus;
 
 import android.content.Context;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.noinnion.android.reader.api.ExtensionPrefs;
@@ -21,12 +22,17 @@ public class Prefs extends ExtensionPrefs {
 		putBoolean(c, KEY_LOGGED_IN, value);
 	}
 
-	public static String getSessionData(Context c) {
-		return getString(c, KEY_JSON);
+	public static JSONObject getSessionData(Context c) {
+		try {
+			return new JSONObject(getString(c, KEY_JSON));
+		}
+		catch (JSONException e) {
+			return null;
+		}
 	}
 
 	public static void setSessionData(Context c, JSONObject json) {
-		putString(c, KEY_JSON, json.toString());
+		putString(c, KEY_JSON, (json != null) ? json.toString() : "");
 	}
 	
 	public static String getHashesList(Context c) {

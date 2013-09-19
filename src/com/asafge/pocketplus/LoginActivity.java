@@ -1,15 +1,23 @@
 package com.asafge.pocketplus;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
+import android.net.Uri.Builder;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.widget.Toast;
 
 import com.noinnion.android.reader.api.ReaderException;
 import com.noinnion.android.reader.api.ReaderExtension;
-import com.androidquery.AQuery;
 import com.asafge.pocketplus.Prefs;
 
 public class LoginActivity extends Activity {
@@ -25,7 +33,7 @@ public class LoginActivity extends Activity {
 		String action = getIntent().getAction();
 		if (action != null && action.equals(ReaderExtension.ACTION_LOGOUT)) {
 			Prefs.setLoggedIn(c, false);
-			//Prefs.setSessionData(c, JSONObject);
+			Prefs.setSessionData(c, null);
 			setResult(ReaderExtension.RESULT_LOGOUT);
 			finish();
 		}
@@ -35,6 +43,21 @@ public class LoginActivity extends Activity {
 		}
 		else {
 			new GetRequestToken().execute(APICall.API_OAUTH_CONSUMER_KEY, APICall.API_OAUTH_REDIRECT);
+			try {
+				JSONObject json = Prefs.getSessionData(c);
+				if (json != null) {
+					Uri.Builder b = Uri.parse(APICall.API_URL_OAUTH_AUTHORIZE_APP).buildUpon();			
+					b.appendQueryParameter("request_token", json.getString("code"));
+					b.appendQueryParameter("redirect_uri", URLEncoder.encode(APICall.API_OAUTH_REDIRECT, "UTF-8"));
+					Intent launchBrowser = new Intent(Intent.ACTION_VIEW, b.build());
+					startActivity(launchBrowser);
+				}
+			}
+			catch (JSONException e) {
+				e.printStackTrace();
+			} catch (UnsupportedEncodingException e) {
+				e.printStackTrace();
+			}
 		}
 	}
 	
@@ -44,14 +67,13 @@ public class LoginActivity extends Activity {
 			String redirect_uri = params[1];
 
 			final Context c = getApplicationContext();
-			APICall ac = new APICall(APICall.API_URL_LOGIN, c);
+			APICall ac = new APICall(APICall.API_URL_OAUTH_REQUEST_TOKEN, c);
 			ac.addPostParam("consumer_key", key);
 			ac.addPostParam("redirect_uri", redirect_uri);
 			try {
 				ac.sync();
 				Prefs.setSessionData(c, ac.Json);
-				Prefs.setLoggedIn(c, true);
-				setResult(ReaderExtension.RESULT_LOGIN);
+				setResult(ReaderExtension.RESULT_OK);
 				return true;
 			}
 			catch (ReaderException e) {
@@ -74,7 +96,7 @@ public class LoginActivity extends Activity {
             String redirect_uri = params[1];
 
             final Context c = getApplicationContext();
-            APICall ac = new APICall(APICall.API_URL_LOGIN, c);
+            APICall ac = new APICall(APICall.API_URL_OAUTH_ACCESS_TOKEN, c);
             ac.addPostParam("consumer_key", key);
             ac.addPostParam("redirect_uri", redirect_uri);
 

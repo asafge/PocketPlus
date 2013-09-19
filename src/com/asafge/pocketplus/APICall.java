@@ -69,24 +69,18 @@ public class APICall {
 	public void sync() throws ReaderException {
 		if (callback == null)
 			return;
-		try {		
-			addAllParams();
-			aquery.sync(callback);
-			Json = callback.getResult();
-			Status = callback.getStatus();
-			if (Json == null) {
-				Log.e("Pocket+ Debug", "URL: " + callbackUrl);
-				Log.e("Pocket+ Debug", "Status: " + Status.getMessage() + " | " + String.valueOf(Status.getCode()));
-				Log.e("Pocket+ Debug", "Session ID: " + Prefs.getSessionData(aquery.getContext()));
-				throw new ReaderException("Pocket server unreachable");
-			}
-			if ((!Json.getString("authenticated").startsWith("true")) || (Status.getCode() != 200))
-				throw new ReaderException("User not authenticated");
+		addAllParams();
+		aquery.sync(callback);
+		Json = callback.getResult();
+		Status = callback.getStatus();
+		if (Json == null) {
+			Log.e("Pocket+ Debug", "URL: " + callbackUrl);
+			Log.e("Pocket+ Debug", "Status: " + Status.getMessage() + " | " + String.valueOf(Status.getCode()));
+			Log.e("Pocket+ Debug", "Session ID: " + Prefs.getSessionData(aquery.getContext()));
+			throw new ReaderException("Pocket server unreachable");
 		}
-		catch (JSONException e) {
-			Log.e("Pocket+ Debug", "JSON Object: " + Json.toString());
-			throw new ReaderException("Unknown API response");
-		}
+		if (Status.getCode() != 200)
+			throw new ReaderException("OAuth process error");
 	}
 	
 	// Run synchronous HTTP request, check valid response + successful operation 
@@ -106,30 +100,31 @@ public class APICall {
     public static String API_OAUTH_REDIRECT = "pocket:callback;";
 
 
-	public static String API_URL_BASE = "http://getpocket.com/";
 	public static String API_URL_BASE_SECURE = "https://getpocket.com/";
-	public static String API_URL_LOGIN = API_URL_BASE_SECURE + "v3/oauth/request";
+	public static String API_URL_OAUTH_REQUEST_TOKEN = API_URL_BASE_SECURE + "v3/oauth/request";
+	public static String API_URL_OAUTH_AUTHORIZE_APP = API_URL_BASE_SECURE + "auth/authorize";
+	public static String API_URL_OAUTH_ACCESS_TOKEN = API_URL_BASE_SECURE + "v3/oauth/authorize";
 	
-	public static String API_URL_FOLDERS_AND_FEEDS = API_URL_BASE + "reader/feeds?flat=true";
-	public static String API_URL_UNREAD_HASHES = API_URL_BASE + "reader/unread_story_hashes";
-	public static String API_URL_RIVER = API_URL_BASE + "reader/river_stories";
-	public static String API_URL_REFRESH_FEEDS = API_URL_BASE + "reader/refresh_feeds/";
+	public static String API_URL_FOLDERS_AND_FEEDS = API_URL_BASE_SECURE + "reader/feeds?flat=true";
+	public static String API_URL_UNREAD_HASHES = API_URL_BASE_SECURE + "reader/unread_story_hashes";
+	public static String API_URL_RIVER = API_URL_BASE_SECURE + "reader/river_stories";
+	public static String API_URL_REFRESH_FEEDS = API_URL_BASE_SECURE + "reader/refresh_feeds/";
 	
-	public static String API_URL_MARK_STORY_AS_READ = API_URL_BASE + "reader/mark_story_hashes_as_read/";
-	public static String API_URL_MARK_STORY_AS_UNREAD = API_URL_BASE + "reader/mark_story_as_unread/";
-	public static String API_URL_MARK_FEED_AS_READ = API_URL_BASE + "reader/mark_feed_as_read";
-	public static String API_URL_MARK_ALL_AS_READ = API_URL_BASE + "reader/mark_all_as_read/";
+	public static String API_URL_MARK_STORY_AS_READ = API_URL_BASE_SECURE + "reader/mark_story_hashes_as_read/";
+	public static String API_URL_MARK_STORY_AS_UNREAD = API_URL_BASE_SECURE + "reader/mark_story_as_unread/";
+	public static String API_URL_MARK_FEED_AS_READ = API_URL_BASE_SECURE + "reader/mark_feed_as_read";
+	public static String API_URL_MARK_ALL_AS_READ = API_URL_BASE_SECURE + "reader/mark_all_as_read/";
 	
-	public static String API_URL_STARRED_HASHES = API_URL_BASE + "reader/starred_story_hashes";
-	public static String API_URL_STARRED_STORIES = API_URL_BASE + "reader/starred_stories";
-	public static String API_URL_MARK_STORY_AS_STARRED = API_URL_BASE + "reader/mark_story_as_starred/";
-	public static String API_URL_MARK_STORY_AS_UNSTARRED = API_URL_BASE + "reader/mark_story_as_unstarred/";
+	public static String API_URL_STARRED_HASHES = API_URL_BASE_SECURE + "reader/starred_story_hashes";
+	public static String API_URL_STARRED_STORIES = API_URL_BASE_SECURE + "reader/starred_stories";
+	public static String API_URL_MARK_STORY_AS_STARRED = API_URL_BASE_SECURE + "reader/mark_story_as_starred/";
+	public static String API_URL_MARK_STORY_AS_UNSTARRED = API_URL_BASE_SECURE + "reader/mark_story_as_unstarred/";
 	
-	public static String API_URL_FEED_ADD = API_URL_BASE + "/reader/add_url";
-	public static String API_URL_FEED_RENAME = API_URL_BASE + "reader/rename_feed";
-	public static String API_URL_FEED_DEL = API_URL_BASE + "reader/delete_feed";
-	public static String API_URL_FEED_MOVE_TO_FOLDER = API_URL_BASE + "reader/move_feed_to_folder";
-	public static String API_URL_FOLDER_ADD = API_URL_BASE + "reader/add_folder";
-	public static String API_URL_FOLDER_RENAME = API_URL_BASE + "reader/rename_folder";
-	public static String API_URL_FOLDER_DEL = API_URL_BASE + "reader/delete_folder";
+	public static String API_URL_FEED_ADD = API_URL_BASE_SECURE + "/reader/add_url";
+	public static String API_URL_FEED_RENAME = API_URL_BASE_SECURE + "reader/rename_feed";
+	public static String API_URL_FEED_DEL = API_URL_BASE_SECURE + "reader/delete_feed";
+	public static String API_URL_FEED_MOVE_TO_FOLDER = API_URL_BASE_SECURE + "reader/move_feed_to_folder";
+	public static String API_URL_FOLDER_ADD = API_URL_BASE_SECURE + "reader/add_folder";
+	public static String API_URL_FOLDER_RENAME = API_URL_BASE_SECURE + "reader/rename_folder";
+	public static String API_URL_FOLDER_DEL = API_URL_BASE_SECURE + "reader/delete_folder";
 }
