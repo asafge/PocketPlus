@@ -48,7 +48,7 @@ public class APICall {
 		callback.header("Content-Type", "application/x-www-form-urlencoded; charset=UTF8");
 		callback.url(callbackUrl).type(JSONObject.class);
 		callback.timeout(5000);
-		callback.retry(3);
+		//callback.retry(3);
 	}
 	
 	// Add a Post parameter to this call
@@ -71,7 +71,6 @@ public class APICall {
 			return;
 		try {		
 			addAllParams();
-			callback.method(AQuery.METHOD_POST);
 			aquery.sync(callback);
 			Json = callback.getResult();
 			Status = callback.getStatus();
@@ -104,7 +103,7 @@ public class APICall {
 	
 	// API constants
     public static String API_OAUTH_CONSUMER_KEY = "16932-b0d065023261f24a7fa5ffcd";
-    public static String API_OAUTH_REDIRECT = "pocket://callback;";
+    public static String API_OAUTH_REDIRECT = "pocket:callback;";
 
 
 	public static String API_URL_BASE = "http://www.getpocket.com/";
