@@ -48,7 +48,7 @@ public class APICall {
 		callback.header("Content-Type", "application/x-www-form-urlencoded; charset=UTF8");
 		callback.url(callbackUrl).type(JSONObject.class);
 		callback.timeout(5000);
-		//callback.retry(3);
+		callback.retry(3);
 	}
 	
 	// Add a Post parameter to this call
@@ -106,8 +106,8 @@ public class APICall {
     public static String API_OAUTH_REDIRECT = "pocket:callback;";
 
 
-	public static String API_URL_BASE = "http://www.getpocket.com/";
-	public static String API_URL_BASE_SECURE = "https://www.getpocket.com/";
+	public static String API_URL_BASE = "http://getpocket.com/";
+	public static String API_URL_BASE_SECURE = "https://getpocket.com/";
 	public static String API_URL_LOGIN = API_URL_BASE_SECURE + "v3/oauth/request";
 	
 	public static String API_URL_FOLDERS_AND_FEEDS = API_URL_BASE + "reader/feeds?flat=true";

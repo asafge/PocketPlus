@@ -47,7 +47,6 @@ public class LoginActivity extends Activity {
 			APICall ac = new APICall(APICall.API_URL_LOGIN, c);
 			ac.addPostParam("consumer_key", key);
 			ac.addPostParam("redirect_uri", redirect_uri);
-
 			try {
 				ac.sync();
 				Prefs.setSessionData(c, ac.Json);
