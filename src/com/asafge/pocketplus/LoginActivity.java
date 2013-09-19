@@ -11,7 +11,6 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
-import android.net.Uri.Builder;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.widget.Toast;
@@ -26,6 +25,7 @@ public class LoginActivity extends Activity {
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
+		// TODO: Remove code from on create, it causes a loop
 		super.onCreate(savedInstanceState);
 		final Context c = getApplicationContext();
 		setResult(RESULT_CANCELED);	
@@ -48,19 +48,26 @@ public class LoginActivity extends Activity {
 				if (json != null) {
 					Uri.Builder b = Uri.parse(APICall.API_URL_OAUTH_AUTHORIZE_APP).buildUpon();			
 					b.appendQueryParameter("request_token", json.getString("code"));
-					b.appendQueryParameter("redirect_uri", URLEncoder.encode(APICall.API_OAUTH_REDIRECT, "UTF-8"));
+					b.appendQueryParameter("redirect_uri", APICall.API_OAUTH_REDIRECT);
 					Intent launchBrowser = new Intent(Intent.ACTION_VIEW, b.build());
 					startActivity(launchBrowser);
 				}
 			}
 			catch (JSONException e) {
 				e.printStackTrace();
-			} catch (UnsupportedEncodingException e) {
-				e.printStackTrace();
 			}
 		}
 	}
 	
+	@Override
+	protected void onResume() {
+		// TODO: Resume oauth here
+		super.onResume();
+	}
+	
+	/*
+	 * OAuth step 1 - get request token for Pocket+, for this user.
+	 */
 	private class GetRequestToken extends AsyncTask<String, Void, Boolean> {
 		protected Boolean doInBackground(String... params) {
 			String key = params[0];
