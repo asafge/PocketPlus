@@ -13,7 +13,6 @@ import com.androidquery.AQuery;
 import com.androidquery.callback.AjaxCallback;
 import com.androidquery.callback.AjaxStatus;
 import com.noinnion.android.reader.api.ReaderException;
-import com.noinnion.android.reader.api.provider.ITag;
 
 public class APICall {
 	
@@ -92,7 +91,7 @@ public class APICall {
 		if (Json == null) {
 			Log.e("Pocket+ Debug", "URL: " + callbackUrl);
 			Log.e("Pocket+ Debug", "Status: " + Status.getMessage() + " | " + String.valueOf(Status.getCode()));
-			Log.e("Pocket+ Debug", "Session ID: " + Prefs.getSessionData(aquery.getContext()));
+			Log.e("Pocket+ Debug", "Session Data: " + Prefs.getSessionData(aquery.getContext()));
 			throw new ReaderException("Pocket server unreachable");
 		}
 		if (Status.getCode() != 200)
@@ -109,16 +108,6 @@ public class APICall {
 			Log.e("Pocket+ Debug", "JSON Object: " + Json.toString());
 			throw new ReaderException("Unknown API response");
 		}		
-	}
-	
-	// Create a new tag object
-	public static ITag createTag(String name, boolean isStar) {
-		ITag tag = new ITag();
-		tag.label = name;
-		String prefix = isStar ? "STAR" : "FOL";
-		tag.uid = name = (prefix + ":" + name);
-		tag.type = isStar ? ITag.TYPE_TAG_STARRED : ITag.TYPE_FOLDER;
-		return tag;
 	}
 	
 	// API constants
