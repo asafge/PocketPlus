@@ -125,13 +125,21 @@ public class LoginActivity extends Activity {
 	            ac.addPostParam("code", Prefs.getSessionData(c).getString("code"));
 				ac.sync();
 				
-				Prefs.setSessionData(c, ac.Json);
-				Prefs.setLoggedIn(c, true);
-				setResult(ReaderExtension.RESULT_LOGIN);
-				return true;
+				if (ac.Json.getString("access_token") != "") {
+					Prefs.setSessionData(c, ac.Json);
+					Prefs.setLoggedIn(c, true);
+					setResult(ReaderExtension.RESULT_LOGIN);
+					return true;
+				}
+				else {
+					Prefs.setSessionData(c, null);
+					Prefs.setLoggedIn(c, false);
+					return false;	
+				}
 			}
 			catch (JSONException e) {
 				Prefs.setSessionData(c, null);
+				Prefs.setLoggedIn(c, false);
 				Log.e("Pocket+ Debug", e.getMessage());
 				return false;
 			}
