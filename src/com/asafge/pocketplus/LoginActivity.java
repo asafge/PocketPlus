@@ -45,6 +45,10 @@ public class LoginActivity extends Activity {
 			new GetRequestToken().execute();
 			finish();
 		}
+		else {
+			new GetAccessToken().execute();
+			finish();
+		}
 	}
 
 	/* 
@@ -53,8 +57,8 @@ public class LoginActivity extends Activity {
 	@Override
 	protected void onResume() {
 		super.onResume();
-		new GetAccessToken().execute();
-		finish();
+		//new GetAccessToken().execute();
+		//finish();
 	}
 
 	/*
@@ -72,7 +76,6 @@ public class LoginActivity extends Activity {
 				ac.sync();
 				
 				Prefs.setSessionData(c, ac.Json);
-				setResult(ReaderExtension.RESULT_OK);
 				return true;
 			}
 			catch (ReaderException e) {
