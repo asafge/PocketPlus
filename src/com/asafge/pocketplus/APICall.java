@@ -65,6 +65,21 @@ public class APICall {
 			callback.param(p.Key, p.Value);
 	}
 	
+	// Make this API call an authenticated one.
+	public APICall makeAuthenticated() throws ReaderException {
+		final Context c = aquery.getContext();
+		try {
+			this.addPostParam("consumer_key", APICall.API_OAUTH_CONSUMER_KEY);
+			this.addPostParam("access_token", Prefs.getSessionData(c).getString("access_token"));
+			return this;
+		}
+		catch (JSONException e) {
+			Prefs.setSessionData(c, null);
+			Prefs.setLoggedIn(c, false);
+			throw new ReaderException("User not authenticated");
+		}
+	}
+	
 	// Run synchronous HTTP request and check for valid response
 	public void sync() throws ReaderException {
 		if (callback == null)
@@ -82,7 +97,7 @@ public class APICall {
 		if (Status.getCode() != 200)
 			throw new ReaderException("OAuth process error");
 	}
-	
+		
 	// Run synchronous HTTP request, check valid response + successful operation 
 	public boolean syncGetResultOk() throws ReaderException {
 		try {
