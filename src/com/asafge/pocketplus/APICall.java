@@ -97,7 +97,7 @@ public class APICall {
 	
 	// API constants
     public static String API_OAUTH_CONSUMER_KEY = "16932-b0d065023261f24a7fa5ffcd";
-    public static String API_OAUTH_REDIRECT = "pocketplus:authorizationFinished";
+    public static String API_OAUTH_REDIRECT = "pocketplus:callback";
 
 	public static String API_URL_BASE_SECURE = "https://getpocket.com/";
 	public static String API_URL_OAUTH_REQUEST_TOKEN = API_URL_BASE_SECURE + "v3/oauth/request";

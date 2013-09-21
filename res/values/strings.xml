@@ -5,18 +5,28 @@
     
     <!-- Extension -->
     <string name="extension_name">Pocket+</string>
-    <string name="extension_description">News+ extension for the Pocket service.</string>
+    <string name="extension_description">News+ extension for the Pocket read-later service.</string>
     <string name="extension_settings_title">Settings</string>
     <string name="extension_login_title">Login</string>
     <string name="Extension_login_username">Username</string>
     <string name="Extension_login_password">Password</string>
     
+    <!-- Login -->
     <string name="msg_login_running">Login…</string>
     <string name="msg_login_fail">Login failed. Please try again.</string>
+    <string name="login_id">Username</string>
+    <string name="login_password">Password</string>
+    <string name="txt_login">Login</string>
     
-	<string name="login_welcome">Please login to Pocket to continue:</string>
+    <!-- Startup -->
+    <string name="welcome_title">Welcome to Pocket+</string>
+    <string name="welcome_text">Note: </string>
+	<string name="login_welcome">Please authenticate this app with Pocket to continue</string>
+	<string name="txt_start_app">Start News+</string>
+    <string name="txt_download_app">Download News+</string>
+    <string name="txt_feedback">Send Feedback</string>
     
-    <!-- err -->
+    <!-- Errors -->
     <string name="err_io">Network error</string>
     
 </resources>
