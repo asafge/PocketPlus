@@ -121,7 +121,7 @@ public class PocketPlus extends ReaderExtension {
 					list.put(action);
 				}
 				ac.addPostParam("action", list.toString());
-				return ac.syncGetResultOk();
+				return ac.makeAuthenticated().syncGetResultOk();
 			}
 			else {
 				// TODO: Mark tag as read
@@ -203,7 +203,7 @@ public class PocketPlus extends ReaderExtension {
 				list.put(action);
 			}
 			ac.addPostParam("action", list.toString());
-			return ac.syncGetResultOk();
+			return ac.makeAuthenticated().syncGetResultOk();
 		}
 		catch (JSONException e) {
 			Log.e("Pocket+ Debug", "JSONExceotion: " + e.getMessage());
@@ -231,6 +231,7 @@ public class PocketPlus extends ReaderExtension {
 		return false;
 	}
 	
+	
 	/* 
 	 * Not implemented in Pocket+ - get unread item IDs
 	 */
@@ -240,6 +241,7 @@ public class PocketPlus extends ReaderExtension {
 		return;
 	}
 
+	
 	/* 
 	 * Not implemented in Pocket+ - get feed/folder structure
 	 */
@@ -249,6 +251,7 @@ public class PocketPlus extends ReaderExtension {
 			ReaderException {
 		return;
 	}
+	
 
 	/* 
 	 * Not implemented in Pocket+ - editing subscriptions (add/delete/rename/change-folder)
