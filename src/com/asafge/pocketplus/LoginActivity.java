@@ -13,6 +13,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.Log;
 
 import com.noinnion.android.reader.api.ReaderException;
 import com.noinnion.android.reader.api.ReaderExtension;
@@ -35,20 +36,17 @@ public class LoginActivity extends Activity {
 			Prefs.setLoggedIn(c, false);
 			Prefs.setSessionData(c, null);
 			setResult(ReaderExtension.RESULT_LOGOUT);
-			finish();
 		}
 		else if (Prefs.isLoggedIn(c)) {
 			setResult(ReaderExtension.RESULT_LOGIN);
-			finish();
 		}
 		else if (Prefs.getSessionData(c) == null) {
 			new GetRequestToken().execute();
-			finish();
 		}
 		else {
 			new GetAccessToken().execute();
-			finish();
 		}
+		finish();
 	}
 
 	/* 
@@ -79,7 +77,7 @@ public class LoginActivity extends Activity {
 				return true;
 			}
 			catch (ReaderException e) {
-				Prefs.setLoggedIn(c, false);
+				Prefs.setSessionData(c, null);
 				return false;
 			}
 		}
@@ -87,8 +85,8 @@ public class LoginActivity extends Activity {
 		// Save request token code
 		protected void onPostExecute(Boolean result) {
 			super.onPostExecute(result);
+			final Context c = getApplicationContext();
 			try {
-				Context c = getApplicationContext();
 				JSONObject json = Prefs.getSessionData(c);
 				if (json != null) {
 					Uri.Builder b = Uri.parse(APICall.API_URL_OAUTH_AUTHORIZE_APP).buildUpon();			
@@ -99,10 +97,11 @@ public class LoginActivity extends Activity {
 				}
 			}
 			catch (JSONException e) {
-				// TODO
+				Prefs.setSessionData(c, null);
+				Log.e("Pocket+ Debug", e.getMessage());
 			}
 			catch (UnsupportedEncodingException e) {
-				// TODO
+				Log.e("Pocket+ Debug", e.getMessage());
 			}
 		}
 	}
@@ -114,7 +113,7 @@ public class LoginActivity extends Activity {
 
         // Show the login... process dialog
         protected void onPreExecute() {
-            mBusy = ProgressDialog.show(LoginActivity.this, null, getText(R.string.msg_login_running), true, true);
+            //mBusy = ProgressDialog.show(LoginActivity.this, null, getText(R.string.msg_login_running), true, true);
         }
 
         // Get access token from Pocket API
@@ -132,7 +131,8 @@ public class LoginActivity extends Activity {
 				return true;
 			}
 			catch (JSONException e) {
-				// TODO
+				Prefs.setSessionData(c, null);
+				Log.e("Pocket+ Debug", e.getMessage());
 				return false;
 			}
 			catch (ReaderException e) {
