@@ -13,9 +13,6 @@ import android.os.RemoteException;
 import android.util.Log;
 
 import com.asafge.pocketplus.APICall;
-import com.asafge.pocketplus.APIHelper;
-import com.asafge.pocketplus.Prefs;
-import com.asafge.pocketplus.RotateQueue;
 import com.asafge.pocketplus.StarredTag;
 import com.noinnion.android.reader.api.ReaderException;
 import com.noinnion.android.reader.api.ReaderExtension;
@@ -24,6 +21,7 @@ import com.noinnion.android.reader.api.internal.IItemListHandler;
 import com.noinnion.android.reader.api.internal.ISubscriptionListHandler;
 import com.noinnion.android.reader.api.internal.ITagListHandler;
 import com.noinnion.android.reader.api.provider.IItem;
+import com.noinnion.android.reader.api.provider.ITag;
 
 public class PocketPlus extends ReaderExtension {
 	private Context c;
@@ -38,83 +36,24 @@ public class PocketPlus extends ReaderExtension {
 	};
 	
 	/*
-	 * Non implemented
-	 */
-	@Override
-	public void handleReaderList(ITagListHandler arg0,
-			ISubscriptionListHandler arg1, long arg2) throws IOException,
-			ReaderException {
-	}
-	
-	/* 
-	 * Get a list of unread story IDS (URLs), UI will mark all other as read.
-	 * This really speeds up the sync process. 
-	 */
-	@Override
-	public void handleItemIdList(IItemIdListHandler handler, long syncTime) throws ReaderException {
-		try {
-			int limit = handler.limit();
-			String uid = handler.stream();
-			
-			if (uid.startsWith(ReaderExtension.STATE_STARRED))
-				handler.items(APIHelper.getStarredHashes(c, limit, null));
-			else if (uid.startsWith(ReaderExtension.STATE_READING_LIST)) {
-				List<String> hashes = APIHelper.getUnreadHashes(c, limit, null, null);
-				handler.items(hashes);
-			}
-			else {
-				Log.e("Pocket+ Debug", "Unknown reading state: " + uid);
-				throw new ReaderException("Unknown reading state");
-			}
-		}
-		catch (RemoteException e) {
-			throw new ReaderException("ItemID handler error", e);
-		}
-	}
-	
-	/*
-	 * Handle a single item list (a feed or a folder).
+	 * Get the list of all stories (starred or regular).
 	 * This functions calls the parseItemList function.
 	 */
 	@Override
 	public void handleItemList(IItemListHandler handler, long syncTime) throws ReaderException {
 		try {
+			APICall ac = new APICall(APICall.API_URL_GET, c);
 			String uid = handler.stream();
-			String url = APICall.API_URL_RIVER;
-			int limit = handler.limit();
-			int chunk = 100;
-			List<String> hashes;
-			
-			// Load the seen hashes from prefs
-			if (uid.startsWith(ReaderExtension.STATE_READING_LIST) && (handler.startTime() <= 0))
-				Prefs.setHashesList(c, "");
-			RotateQueue<String> seenHashes = new RotateQueue<String>(1000, Prefs.getHashesList(c));
-					
-			if (uid.startsWith(ReaderExtension.STATE_STARRED)) {
-				hashes = APIHelper.getStarredHashes(c, limit, seenHashes);
-				url = APICall.API_URL_STARRED_STORIES;
-			}
-			else if (uid.startsWith(ReaderExtension.STATE_READING_LIST)) {
-				List<String> unread_hashes = APIHelper.getUnreadHashes(c, limit, null, seenHashes);
-				hashes =  new ArrayList<String>();
-				/*for (String h : unread_hashes)
-					if (!handler.excludedStreams().contains(APIHelper.getFeedUrlFromFeedId(h)))
-						hashes.add(h);*/
-			}
-			else {
-				Log.e("Pocket+ Debug", "Unknown reading state: " + uid);
-				throw new ReaderException("Unknown reading state");
-			}
 				
-			for (int start=0; start < hashes.size(); start += chunk) {
-				APICall ac = new APICall(url, c);
-				int end = (start+chunk < hashes.size()) ? start + chunk : hashes.size();
-				//ac.addGetParams("h", hashes.subList(start, end));
-				ac.sync();
-				parseItemList(ac.Json, handler, seenHashes);
-			}
-			// Save the seen hashes as a serialized String
-			Prefs.setHashesList(c, seenHashes.toString());
+			ac.addPostParam("state", "unread");
+			ac.addPostParam("sort", "newest");
+			ac.addPostParam("detailType", "complete");
+			ac.addPostParam("since", String.valueOf(syncTime));
+			ac.addPostParam("count", String.valueOf(handler.limit()));
+			ac.addPostParam("favorite", uid.startsWith(ReaderExtension.STATE_STARRED) ? "1" : "0");
+			
+			ac.makeAuthenticated().sync();
+			parseItemList(ac.Json, handler);
 		}
 		catch (RemoteException e) {
 			throw new ReaderException("ItemList handler error", e);
@@ -124,26 +63,25 @@ public class PocketPlus extends ReaderExtension {
 	/*
 	 * Parse an array of items that are in the NewsBlur JSON format.
 	 */
-	public void parseItemList(JSONObject json, IItemListHandler handler, RotateQueue<String> seenHashes) throws ReaderException {
+	public void parseItemList(JSONObject json, IItemListHandler handler) throws ReaderException {
 		try {
 			int length = 0;
 			List<IItem> items = new ArrayList<IItem>();
-			JSONArray arr = json.getJSONArray("stories");
+			JSONArray arr = json.getJSONArray("list");	// TODO
 			for (int i=0; i<arr.length(); i++) {
 				JSONObject story = arr.getJSONObject(i);
 				IItem item = new IItem();
-				item.title = story.getString("story_title");
-				item.link = story.getString("story_permalink");
-				item.uid = story.getString("story_hash");
-				item.updatedTime = story.getLong("story_timestamp");
-				item.publishedTime = story.getLong("story_timestamp");
-				item.read = (story.getInt("read_status") == 1);
-				item.content = story.getString("story_content");
-				item.starred = (story.has("starred") && story.getString("starred") == "true");
+				item.title = story.getString("resolved_title");
+				item.link = story.getString("resolved_url");
+				item.uid = story.getString("resolved_id");
+				item.read = (story.getInt("status") != 0);
+				item.starred = (story.getString("favorite") == "1");
 				if (item.starred)
 					item.addCategory(StarredTag.get().uid);
+				
+				//item.updatedTime = story.getLong("story_timestamp");
+				//item.publishedTime = story.getLong("story_timestamp");	
 				items.add(item);
-				seenHashes.AddElement(item.uid);
 				
 				length += item.getLength();
 				if (items.size() % 200 == 0 || length > 300000) {
@@ -168,22 +106,31 @@ public class PocketPlus extends ReaderExtension {
 	 * Main function for marking stories (and their feeds) as read/unread.
 	 */
 	private boolean markAs(boolean read, String[]  itemUids, String[]  subUIds) throws ReaderException	{	
-		APICall ac;
-		if (itemUids == null && subUIds == null) {
-			ac = new APICall(APICall.API_URL_MARK_ALL_AS_READ, c);
-			return ac.syncGetResultOk();
-		}
-		else {
-			if (itemUids != null) {
-				String url = read ? APICall.API_URL_MARK_STORY_AS_READ : APICall.API_URL_MARK_STORY_AS_UNREAD;
-				ac = new APICall(url, c);
-				for (int i=0; i<itemUids.length; i++) {
-					ac.addPostParam("story_id", itemUids[i]);
+		APICall ac = new APICall(APICall.API_URL_SEND, c);
+		try {
+			if (itemUids == null && subUIds == null) {
+				// TODO: Exception
+				return false;
+			}
+			else if (itemUids != null) {
+				JSONArray list = new JSONArray();
+				for (String itemUid : itemUids) {
+					JSONObject action = new JSONObject();
+					action.put("action", read ? "archive" : "readd");
+					action.put("item_id", itemUid);
+					list.put(action);
 				}
+				ac.addPostParam("action", list.toString());
 				return ac.syncGetResultOk();
 			}
+			else {
+				// TODO: Mark tag as read
+				return false;
+			}
 		}
-		return false;
+		catch (JSONException e) {
+			return false;	
+		}
 	}
 
 	/* 
@@ -212,50 +159,70 @@ public class PocketPlus extends ReaderExtension {
 	}
 
 	/*
-	 * Edit an item's tag - currently supports only starring/unstarring items
+	 * Create a new tag object 
 	 */
-	@Override
-	public boolean editItemTag(String[] itemUids, String[] subUids, String[] addTags, String[] removeTags) throws IOException, ReaderException {
-		boolean result = true;
-		for (int i=0; i<itemUids.length; i++) {
-			String url;
-			if ((addTags != null) && addTags[i].startsWith(StarredTag.get().uid)) {
-				url = APICall.API_URL_MARK_STORY_AS_STARRED;
-			}
-			else if ((removeTags != null) && removeTags[i].startsWith(StarredTag.get().uid)) {
-				url = APICall.API_URL_MARK_STORY_AS_UNSTARRED;
-			}
-			else {
-				result = false;
-				throw new ReaderException("This type of tag is not supported");
-			}
-			APICall ac = new APICall(url, c);
-			ac.addPostParam("story_id", itemUids[i]);
-			if (!ac.syncGetResultOk())
-				break;
-		}
-		return result;
-	}
-
-	/*
-	 * Rename a top level folder both in News+ and in NewsBlur server
-	 */
-	@Override
-	public boolean renameTag(String tagUid, String oldLabel, String newLabel) throws IOException, ReaderException {
-		if (!tagUid.startsWith("FOL:"))
-			return false;
-		else {
-			APICall ac = new APICall(APICall.API_URL_FOLDER_RENAME, c);
-			ac.addPostParam("folder_to_rename", oldLabel);
-			ac.addPostParam("new_folder_name", newLabel);
-			ac.addPostParam("in_folder", "");
-			return ac.syncGetResultOk();
-		}
+	public static ITag createTag(String name, boolean isStar) {
+		ITag tag = new ITag();
+		tag.label = name;
+		String prefix = isStar ? "STAR" : "FOL";
+		tag.uid = name = (prefix + ":" + name);
+		tag.type = isStar ? ITag.TYPE_TAG_STARRED : ITag.TYPE_FOLDER;
+		return tag;
 	}
 	
 	/*
-	 * Delete a top level folder both in News+ and in NewsBlur server
-	 * This just removes the folder, not the feeds in it
+	 * Edit an item's tag - starring/unstarring items, or changing string-tags
+	 */
+	@Override
+	public boolean editItemTag(String[] itemUids, String[] subUids, String[] addTags, String[] removeTags) throws IOException, ReaderException {
+		try {
+			APICall ac = new APICall(APICall.API_URL_SEND, c);
+			JSONArray list = new JSONArray();
+			for (int i=0; i<itemUids.length; i++) {
+				JSONObject action = new JSONObject();
+				action.put("item_id", itemUids[i]);
+
+				if (addTags != null) {			
+					if (addTags[i].startsWith(StarredTag.get().uid)) { 
+						action.put("action", "favorite");
+					}
+					else {
+						action.put("action", "tags_add");
+						action.put("tags", addTags[i]);
+					}
+				}
+				if (removeTags != null) {			
+					if (removeTags[i].startsWith(StarredTag.get().uid)) { 
+						action.put("action", "unfavorite");
+					}
+					else {
+						action.put("action", "tags_remove");
+						action.put("tags", addTags[i]);
+					}
+				}
+				list.put(action);
+			}
+			ac.addPostParam("action", list.toString());
+			return ac.syncGetResultOk();
+		}
+		catch (JSONException e) {
+			Log.e("Pocket+ Debug", "JSONExceotion: " + e.getMessage());
+			return false;
+		}
+	}
+
+	/*
+	 * Rename a top level tag both in News+ and in Pocket server
+	 */
+	@Override
+	public boolean renameTag(String tagUid, String oldLabel, String newLabel) throws IOException, ReaderException {
+		// TODO
+		return false;
+	}
+	
+	/*
+	 * Delete a top level tag both in News+ and in Pocket server
+	 * This just removes the tag, not the feeds in it
 	 */
 	@Override
 	public boolean disableTag(String tagUid, String label) throws IOException, ReaderException {
@@ -264,50 +231,32 @@ public class PocketPlus extends ReaderExtension {
 		return false;
 	}
 	
-	/*
-	 * Main function for editing subscriptions - add/delete/rename/change-folder
-	 */	
+	/* 
+	 * Not implemented in Pocket+ - get unread item IDs
+	 */
 	@Override
-	public boolean editSubscription(String uid, String title, String feed_url, String[] tags, int action, long syncTime) throws IOException, ReaderException {
-		boolean result = false;
-		switch (action) {
-			// Feed - add/delete/rename
-			case ReaderExtension.SUBSCRIPTION_ACTION_SUBCRIBE: {
-				APICall ac = new APICall(APICall.API_URL_FEED_ADD, c);
-				ac.addPostParam("url", feed_url);
-				result = ac.syncGetResultOk();
-				break;
-			}
-			case ReaderExtension.SUBSCRIPTION_ACTION_UNSUBCRIBE: {
-				APICall ac = new APICall(APICall.API_URL_FEED_DEL, c);
-				result = ac.syncGetResultOk();
-				break;
-			}
-			case ReaderExtension.SUBSCRIPTION_ACTION_EDIT: {
-				APICall ac = new APICall(APICall.API_URL_FEED_RENAME, c);
-				ac.addPostParam("feed_title", title);
-				result = ac.syncGetResultOk();
-				break;
-			}
-			// Feed's parent folder - new_folder/add_to_folder/delete_from_folder
-			case ReaderExtension.SUBSCRIPTION_ACTION_NEW_LABEL: {
-				APICall ac = new APICall(APICall.API_URL_FOLDER_ADD, c);
-				String newTag = tags[0].replace("FOL:", "");
-				ac.addPostParam("folder", newTag);
-				result = ac.syncGetResultOk();
-				break;
-			}
-			case ReaderExtension.SUBSCRIPTION_ACTION_ADD_LABEL: {
-				String newTag = tags[0].replace("FOL:", "");
-				//result = APIHelper.moveFeedToFolder(c, APIHelper.getFeedIdFromFeedUrl(uid), "", newTag);
-				break;
-			}
-			case ReaderExtension.SUBSCRIPTION_ACTION_REMOVE_LABEL: {
-				String newTag = tags[0].replace("FOL:", "");
-				//result = APIHelper.moveFeedToFolder(c, APIHelper.getFeedIdFromFeedUrl(uid), newTag, "");
-				break;
-			}
-		}
-		return result;
+	public void handleItemIdList(IItemIdListHandler arg0, long arg1)
+			throws IOException, ReaderException {
+		return;
+	}
+
+	/* 
+	 * Not implemented in Pocket+ - get feed/folder structure
+	 */
+	@Override
+	public void handleReaderList(ITagListHandler arg0,
+			ISubscriptionListHandler arg1, long arg2) throws IOException,
+			ReaderException {
+		return;
+	}
+
+	/* 
+	 * Not implemented in Pocket+ - editing subscriptions (add/delete/rename/change-folder)
+	 */
+	@Override
+	public boolean editSubscription(String arg0, String arg1, String arg2,
+			String[] arg3, int arg4, long arg5) throws IOException,
+			ReaderException {
+		return false;
 	}
 }
