@@ -22,6 +22,7 @@ import com.noinnion.android.reader.api.internal.IItemListHandler;
 import com.noinnion.android.reader.api.internal.ISubscriptionListHandler;
 import com.noinnion.android.reader.api.internal.ITagListHandler;
 import com.noinnion.android.reader.api.provider.IItem;
+import com.noinnion.android.reader.api.provider.ISubscription;
 import com.noinnion.android.reader.api.provider.ITag;
 
 public class PocketPlus extends ReaderExtension {
@@ -35,6 +36,30 @@ public class PocketPlus extends ReaderExtension {
 		super.onCreate();
 		c = getApplicationContext();
 	};
+	
+	/* 
+	 * Not implemented in Pocket+ - get feed/folder structure
+	 */
+	@Override
+	public void handleReaderList(ITagListHandler tagHandler, ISubscriptionListHandler subHandler, long syncTime) throws ReaderException {
+		try {
+			List<ISubscription> subs = new ArrayList<ISubscription>();
+			List<ITag> tags = new ArrayList<ITag>();
+			
+			ISubscription home = new ISubscription();
+			home.title = APICall.POCKET_HOME_TITLE;
+			home.uid = APICall.POCKET_HOME_TITLE;
+			home.htmlUrl = APICall.POCKET_HOME_URL;
+			subs.add(home);
+			subHandler.subscriptions(subs);
+			
+			tags.add(StarredTag.get());			
+			tagHandler.tags(tags);
+		}
+		catch (RemoteException e) {
+			throw new ReaderException("Sub/tag handler error", e);
+		}
+	}
 	
 	/*
 	 * Get the list of all stories (starred or regular).
@@ -75,13 +100,14 @@ public class PocketPlus extends ReaderExtension {
 					String uid = (String)keys.next();
 					JSONObject story = item_list.getJSONObject(uid);
 					IItem item = new IItem();
-					item.subUid = APICall.POCKET_HOME;
+					item.subUid = APICall.POCKET_HOME_TITLE;
 					item.uid = uid;
-					item.title = story.getString("resolved_title");
-					item.link = story.getString("resolved_url");
+					item.title = story.getString("given_title");
+					item.link = story.getString("given_url");
 					item.id = Long.parseLong(uid);
 					item.read = (story.getInt("status") != 0);
 					item.starred = (story.getString("favorite") == "1");
+					item.content = story.getString("excerpt");
 					if (item.starred)
 						item.addCategory(StarredTag.get().uid);
 					
@@ -246,17 +272,6 @@ public class PocketPlus extends ReaderExtension {
 	@Override
 	public void handleItemIdList(IItemIdListHandler arg0, long arg1)
 			throws IOException, ReaderException {
-		return;
-	}
-
-	
-	/* 
-	 * Not implemented in Pocket+ - get feed/folder structure
-	 */
-	@Override
-	public void handleReaderList(ITagListHandler arg0,
-			ISubscriptionListHandler arg1, long arg2) throws IOException,
-			ReaderException {
 		return;
 	}
 	
