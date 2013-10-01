@@ -70,13 +70,18 @@ public class PocketPlus extends ReaderExtension {
 		try {
 			APICall ac = new APICall(APICall.API_URL_GET, c);
 			String uid = handler.stream();
-				
-			ac.addPostParam("state", "unread");
+			
+			if (uid.startsWith(ReaderExtension.STATE_STARRED)) {
+				ac.addPostParam("state", "all");
+				ac.addPostParam("favorite", "1");
+			}
+			else {
+				ac.addPostParam("state", "unread");
+			}
 			ac.addPostParam("sort", "newest");
 			ac.addPostParam("detailType", "complete");
 			//ac.addPostParam("since", String.valueOf(syncTime));
 			ac.addPostParam("count", String.valueOf(handler.limit()));
-			ac.addPostParam("favorite", uid.startsWith(ReaderExtension.STATE_STARRED) ? "1" : "0");
 			
 			ac.makeAuthenticated().sync();
 			parseItemList(ac.Json, handler);
@@ -106,7 +111,7 @@ public class PocketPlus extends ReaderExtension {
 					item.link = story.getString("given_url");
 					item.id = Long.parseLong(uid);
 					item.read = (story.getInt("status") != 0);
-					item.starred = (story.getString("favorite") == "1");
+					item.starred = (story.getString("favorite").startsWith("1"));
 					item.content = story.getString("excerpt");
 					if (item.starred)
 						item.addCategory(StarredTag.get().uid);
