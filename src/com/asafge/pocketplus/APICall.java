@@ -49,6 +49,7 @@ public class APICall {
 		callback.url(callbackUrl).type(JSONObject.class);
 		callback.timeout(5000);
 		callback.retry(3);
+		callback.method(AQuery.METHOD_POST);
 	}
 	
 	// Add a Post parameter to this call
@@ -112,7 +113,7 @@ public class APICall {
 	
 	// API constants
     public static String API_OAUTH_CONSUMER_KEY = "16932-b0d065023261f24a7fa5ffcd";
-    public static String API_OAUTH_REDIRECT = "pocketplus:callback";
+    public static String API_OAUTH_REDIRECT = "pocketplus:authorizationFinished";
 
     // Authentication process
 	public static String API_URL_BASE_SECURE = "https://getpocket.com/";
