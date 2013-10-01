@@ -125,4 +125,7 @@ public class APICall {
 	public static String API_URL_ADD = API_URL_BASE_SECURE + "v3/add";
 	public static String API_URL_GET = API_URL_BASE_SECURE + "v3/get";
 	public static String API_URL_SEND = API_URL_BASE_SECURE + "v3/send";
+	
+	// Internal constants
+	public static String POCKET_HOME = "Pocket Home";
 }

@@ -2,6 +2,7 @@ package com.asafge.pocketplus;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import org.json.JSONArray;
@@ -48,7 +49,7 @@ public class PocketPlus extends ReaderExtension {
 			ac.addPostParam("state", "unread");
 			ac.addPostParam("sort", "newest");
 			ac.addPostParam("detailType", "complete");
-			ac.addPostParam("since", String.valueOf(syncTime));
+			//ac.addPostParam("since", String.valueOf(syncTime));
 			ac.addPostParam("count", String.valueOf(handler.limit()));
 			ac.addPostParam("favorite", uid.startsWith(ReaderExtension.STATE_STARRED) ? "1" : "0");
 			
@@ -67,30 +68,36 @@ public class PocketPlus extends ReaderExtension {
 		try {
 			int length = 0;
 			List<IItem> items = new ArrayList<IItem>();
-			JSONArray arr = json.getJSONArray("list");	// TODO
-			for (int i=0; i<arr.length(); i++) {
-				JSONObject story = arr.getJSONObject(i);
-				IItem item = new IItem();
-				item.title = story.getString("resolved_title");
-				item.link = story.getString("resolved_url");
-				item.uid = story.getString("resolved_id");
-				item.read = (story.getInt("status") != 0);
-				item.starred = (story.getString("favorite") == "1");
-				if (item.starred)
-					item.addCategory(StarredTag.get().uid);
-				
-				//item.updatedTime = story.getLong("story_timestamp");
-				//item.publishedTime = story.getLong("story_timestamp");	
-				items.add(item);
-				
-				length += item.getLength();
-				if (items.size() % 200 == 0 || length > 300000) {
-					handler.items(items, 0);
-					items.clear();
-					length = 0;
+			JSONObject item_list = json.optJSONObject("list");
+			if (item_list != null) {
+				Iterator<?> keys = item_list.keys();
+				while (keys.hasNext()) {
+					String uid = (String)keys.next();
+					JSONObject story = item_list.getJSONObject(uid);
+					IItem item = new IItem();
+					item.subUid = APICall.POCKET_HOME;
+					item.uid = uid;
+					item.title = story.getString("resolved_title");
+					item.link = story.getString("resolved_url");
+					item.id = Long.parseLong(uid);
+					item.read = (story.getInt("status") != 0);
+					item.starred = (story.getString("favorite") == "1");
+					if (item.starred)
+						item.addCategory(StarredTag.get().uid);
+					
+					item.updatedTime = story.getLong("time_updated");
+					item.publishedTime = story.getLong("time_added");
+					items.add(item);
+					
+					length += item.getLength();
+					if (items.size() % 200 == 0 || length > 300000) {
+						handler.items(items, 0);
+						items.clear();
+						length = 0;
+					}
 				}
+				handler.items(items, 0);
 			}
-			handler.items(items, 0);
 		}
 		catch (JSONException e) {
 			Log.e("Pocket+ Debug", "JSONExceotion: " + e.getMessage());
@@ -124,7 +131,7 @@ public class PocketPlus extends ReaderExtension {
 				return ac.makeAuthenticated().syncGetResultOk();
 			}
 			else {
-				// TODO: Mark tag as read
+				// TODO: Mark tag as read (using markAllAsRead function)
 				return false;
 			}
 		}
@@ -155,6 +162,7 @@ public class PocketPlus extends ReaderExtension {
 	 */
 	@Override
 	public boolean markAllAsRead(String arg0, String arg1, String[] arg2, long arg3) throws IOException, ReaderException {
+		// TODO: mark tag as read
 		return false;
 	}
 
