@@ -61,6 +61,55 @@ public class PocketPlus extends ReaderExtension {
 		}
 	}
 	
+	/* 
+	 * Gets the list of unread item IDs, used for 2-way sync.
+	 * This function calls the parseIDList function. 
+	 */
+	@Override
+	public void handleItemIdList(IItemIdListHandler handler, long syncTime) throws ReaderException {
+		try {
+			APICall ac = new APICall(APICall.API_URL_GET, c);
+			String uid = handler.stream();
+			
+			if (uid.startsWith(ReaderExtension.STATE_STARRED)) {
+				ac.addPostParam("state", "all");
+				ac.addPostParam("favorite", "1");
+			}
+			else {
+				ac.addPostParam("state", "unread");
+			}
+			ac.addPostParam("sort", "newest");
+			ac.addPostParam("detailType", "simple");
+			//ac.addPostParam("since", String.valueOf(syncTime));
+			ac.addPostParam("count", String.valueOf(handler.limit()));
+			
+			ac.makeAuthenticated().sync();
+		}
+		catch (RemoteException e) {
+			throw new ReaderException("ItemList handler error", e);
+		}
+	}
+	
+	/*
+	 * Parse an array of items to get the IDs, from the Pocket JSON object.
+	 */
+	public void parseIDList(JSONObject json, IItemIdListHandler handler) throws ReaderException {
+		try {
+			List<String> items = new ArrayList<String>();
+			JSONObject item_list = json.optJSONObject("list");
+			if (item_list != null) {
+				Iterator<?> keys = item_list.keys();
+				while (keys.hasNext()) {
+					items.add((String)keys.next());
+				}
+				handler.items(items);
+			}
+		}
+		catch (RemoteException e) {
+			throw new ReaderException("SingleItem handler error", e);
+		}
+	}
+	
 	/*
 	 * Get the list of all stories (starred or regular).
 	 * This functions calls the parseItemList function.
@@ -92,7 +141,7 @@ public class PocketPlus extends ReaderExtension {
 	}
 	
 	/*
-	 * Parse an array of items that are in the NewsBlur JSON format.
+	 * Parse an array of items that are in the Pocket JSON format.
 	 */
 	public void parseItemList(JSONObject json, IItemListHandler handler) throws ReaderException {
 		try {
@@ -268,16 +317,6 @@ public class PocketPlus extends ReaderExtension {
 		if (tagUid.startsWith("STAR:"))
 			return false;
 		return false;
-	}
-	
-	
-	/* 
-	 * Not implemented in Pocket+ - get unread item IDs
-	 */
-	@Override
-	public void handleItemIdList(IItemIdListHandler arg0, long arg1)
-			throws IOException, ReaderException {
-		return;
 	}
 	
 
