@@ -208,7 +208,7 @@ public class PocketPlus extends ReaderExtension {
 					action.put("item_id", itemUid);
 					list.put(action);
 				}
-				ac.addPostParam("action", list.toString());
+				ac.addPostParam("action", list.toString(2));
 				return ac.makeAuthenticated().syncGetResultOk();
 			}
 			else {
