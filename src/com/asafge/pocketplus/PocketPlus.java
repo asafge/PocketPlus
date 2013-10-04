@@ -84,6 +84,7 @@ public class PocketPlus extends ReaderExtension {
 			ac.addPostParam("count", String.valueOf(handler.limit()));
 			
 			ac.makeAuthenticated().sync();
+			parseIDList(ac.Json, handler);
 		}
 		catch (RemoteException e) {
 			throw new ReaderException("ItemList handler error", e);
