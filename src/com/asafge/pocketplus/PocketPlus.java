@@ -175,6 +175,10 @@ public class PocketPlus extends ReaderExtension {
 							item.addTag(tag.uid, tag.label);
 						}
 					}
+					else {
+						ITag tag = createTag("Uncategorized", false);
+						item.addTag(tag.uid, tag.label);
+					}
 					
 					item.updatedTime = story.getLong("time_updated");
 					item.publishedTime = story.getLong("time_added");
