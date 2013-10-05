@@ -38,7 +38,8 @@ public class PocketPlus extends ReaderExtension {
 	};
 	
 	/* 
-	 * Not implemented in Pocket+ - get feed/folder structure
+	 * Designed for getting feed/folder structure, but Pocket API doesn't have an endpoint for that.
+	 * This function will just initialize the constant tags, user tags are added while parsing stories.
 	 */
 	@Override
 	public void handleReaderList(ITagListHandler tagHandler, ISubscriptionListHandler subHandler, long syncTime) throws ReaderException {
@@ -164,7 +165,16 @@ public class PocketPlus extends ReaderExtension {
 					item.starred = (story.getString("favorite").startsWith("1"));
 					item.content = story.getString("excerpt");
 					if (item.starred)
-						item.addCategory(StarredTag.get().uid);
+						item.addTag(StarredTag.get().uid);
+					
+					JSONObject tags = story.optJSONObject("tags");
+					if (tags != null) {
+						Iterator<?> tag_keys = tags.keys();
+						while (tag_keys.hasNext()) {
+							ITag tag = createTag((String)tag_keys.next(), false);
+							item.addTag(tag.uid, tag.label);
+						}
+					}
 					
 					item.updatedTime = story.getLong("time_updated");
 					item.publishedTime = story.getLong("time_added");
