@@ -176,7 +176,7 @@ public class PocketPlus extends ReaderExtension {
 						}
 					}
 					else {
-						ITag tag = createTag("Uncategorized", false);
+						ITag tag = createTag("Untagged", false);
 						item.addTag(tag.uid, tag.label);
 					}
 					
