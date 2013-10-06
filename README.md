@@ -10,6 +10,7 @@ Features
 * Authenticate with Pocket.
 * Sync unread stories.
 * Sync favorite (starred) storries.
+* Handle read/unread requests.
 
 References
 -------------------------------
