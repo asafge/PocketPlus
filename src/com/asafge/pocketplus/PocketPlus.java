@@ -158,8 +158,8 @@ public class PocketPlus extends ReaderExtension {
 					IItem item = new IItem();
 					item.subUid = APICall.POCKET_HOME_TITLE;
 					item.uid = uid;
-					item.title = story.getString("given_title");
-					item.link = story.getString("given_url");
+					item.title = story.getString("resolved_title");
+					item.link = story.getString("resolved_url");
 					item.id = Long.parseLong(uid);
 					item.read = (story.getInt("status") != 0);
 					item.starred = (story.getString("favorite").startsWith("1"));
