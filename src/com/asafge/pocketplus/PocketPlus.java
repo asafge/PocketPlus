@@ -211,8 +211,7 @@ public class PocketPlus extends ReaderExtension {
 		APICall ac = new APICall(APICall.API_URL_SEND, c);
 		try {
 			if (itemUids == null && subUIds == null) {
-				// TODO: Exception
-				return false;
+				throw new ReaderException("Mark all as read not supported in Pocket");
 			}
 			else if (itemUids != null) {
 				JSONArray list = new JSONArray();
