@@ -222,7 +222,7 @@ public class PocketPlus extends ReaderExtension {
 					action.put("item_id", itemUid);
 					list.put(action);
 				}
-				ac.addPostParam("action", list.toString(2));
+				ac.addPostParam("actions", list.toString());
 				return ac.makeAuthenticated().syncGetResultOk();
 			}
 			else {
@@ -305,7 +305,7 @@ public class PocketPlus extends ReaderExtension {
 				}
 				list.put(action);
 			}
-			ac.addPostParam("action", list.toString());
+			ac.addPostParam("actions", list.toString());
 			return ac.makeAuthenticated().syncGetResultOk();
 		}
 		catch (JSONException e) {
