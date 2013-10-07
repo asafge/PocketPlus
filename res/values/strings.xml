@@ -20,7 +20,7 @@
     
     <!-- Startup -->
     <string name="welcome_title">Welcome to Pocket+</string>
-    <string name="welcome_text">Note: </string>
+    <string name="welcome_text">Please start News+ and authenticate the app with Pocket to continue</string>
 	<string name="login_welcome">Please authenticate this app with Pocket to continue</string>
 	<string name="txt_start_app">Start News+</string>
     <string name="txt_download_app">Download News+</string>
