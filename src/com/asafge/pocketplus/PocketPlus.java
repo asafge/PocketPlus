@@ -266,7 +266,7 @@ public class PocketPlus extends ReaderExtension {
 	public static ITag createTag(String name, boolean isStar) {
 		ITag tag = new ITag();
 		tag.label = name;
-		String prefix = isStar ? "STAR" : "FOL";
+		String prefix = isStar ? "STAR" : "TAG";
 		tag.uid = name = (prefix + ":" + name);
 		tag.type = isStar ? ITag.TYPE_TAG_STARRED : ITag.TYPE_FOLDER;
 		return tag;
@@ -284,22 +284,22 @@ public class PocketPlus extends ReaderExtension {
 				JSONObject action = new JSONObject();
 				action.put("item_id", itemUids[i]);
 
-				if (addTags != null) {			
+				if (addTags != null) {
 					if (addTags[i].startsWith(StarredTag.get().uid)) { 
 						action.put("action", "favorite");
 					}
 					else {
 						action.put("action", "tags_add");
-						action.put("tags", addTags[i]);
+						action.put("tags", new JSONArray().put(addTags[i].replace("TAG:", "")));
 					}
 				}
-				if (removeTags != null) {			
+				if (removeTags != null) {
 					if (removeTags[i].startsWith(StarredTag.get().uid)) { 
 						action.put("action", "unfavorite");
 					}
 					else {
 						action.put("action", "tags_remove");
-						action.put("tags", addTags[i]);
+						action.put("tags", new JSONArray().put(removeTags[i].replace("TAG:", "")));
 					}
 				}
 				list.put(action);
