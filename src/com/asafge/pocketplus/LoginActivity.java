@@ -14,7 +14,6 @@ import android.widget.Toast;
 
 import com.noinnion.android.reader.api.ReaderException;
 import com.noinnion.android.reader.api.ReaderExtension;
-import com.noinnion.android.reader.api.util.Utils;
 import com.asafge.pocketplus.Prefs;
 
 public class LoginActivity extends Activity {
@@ -43,7 +42,6 @@ public class LoginActivity extends Activity {
 		}
 		else {
 			new GetAccessToken().execute();
-			Utils.startAppPackage(this, Prefs.NEWSPLUS_PACKAGE);
 		}
 	}
 
@@ -81,7 +79,7 @@ public class LoginActivity extends Activity {
 					b.appendQueryParameter("request_token", json.getString("code"));
 					b.appendQueryParameter("redirect_uri", APICall.API_OAUTH_REDIRECT);
 					Intent launchBrowser = new Intent(Intent.ACTION_VIEW, b.build());
-					launchBrowser.setFlags(launchBrowser.getFlags() | Intent.FLAG_ACTIVITY_NO_HISTORY);
+					launchBrowser.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 					startActivity(launchBrowser);
 				}
 			}
