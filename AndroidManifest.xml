@@ -39,6 +39,7 @@
         <activity android:name="com.asafge.pocketplus.LoginActivity"
             android:label="@string/extension_login_title"
             android:exported="true" android:theme="@style/Theme.Sherlock.Light.Dialog">
+			android:launchMode="singleInstance"
         	<intent-filter>
 				<action android:name="android.intent.action.VIEW"></action>
 				<category android:name="android.intent.category.DEFAULT"></category>

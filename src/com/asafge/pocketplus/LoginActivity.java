@@ -7,21 +7,19 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.app.Activity;
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.noinnion.android.reader.api.ReaderException;
 import com.noinnion.android.reader.api.ReaderExtension;
 import com.asafge.pocketplus.Prefs;
 
 public class LoginActivity extends Activity {
-
-	protected ProgressDialog mBusy;
 
 	/* 
 	 * Authenticate or logout
@@ -47,16 +45,6 @@ public class LoginActivity extends Activity {
 			new GetAccessToken().execute();
 		}
 		finish();
-	}
-
-	/* 
-	 * Callback from Pocket API application approve page
-	 */
-	@Override
-	protected void onResume() {
-		super.onResume();
-		//new GetAccessToken().execute();
-		//finish();
 	}
 
 	/*
@@ -91,7 +79,7 @@ public class LoginActivity extends Activity {
 				if (json != null) {
 					Uri.Builder b = Uri.parse(APICall.API_URL_OAUTH_AUTHORIZE_APP).buildUpon();			
 					b.appendQueryParameter("request_token", URLEncoder.encode(json.getString("code"), "UTF-8"));
-					b.appendQueryParameter("redirect_uri", URLEncoder.encode(APICall.API_OAUTH_REDIRECT, "UTF-8"));
+					b.appendQueryParameter("redirect_uri", APICall.API_OAUTH_REDIRECT);
 					Intent launchBrowser = new Intent(Intent.ACTION_VIEW, b.build());
 					startActivity(launchBrowser);
 				}
@@ -110,11 +98,6 @@ public class LoginActivity extends Activity {
 	 * OAuth step 2 - upgrade to access token
 	 */
     private class GetAccessToken extends AsyncTask<Void, Void, Boolean> {
-
-        // Show the login... process dialog
-        protected void onPreExecute() {
-            //mBusy = ProgressDialog.show(LoginActivity.this, null, getText(R.string.msg_login_running), true, true);
-        }
 
         // Get access token from Pocket API
         protected Boolean doInBackground(Void... params) {
@@ -150,16 +133,15 @@ public class LoginActivity extends Activity {
 			}
         }
 
-        // On callback - show toast if failed / go to main screen
+        // On callback from the authorize API, show toast if failed or finish activity
         protected void onPostExecute(Boolean result) {
-            /*final Context c = getApplicationContext();
-            if (mBusy != null && mBusy.isShowing())
-                mBusy.dismiss();
-            if (result)
+            final Context c = getApplicationContext();
+            if (result) {
                 finish();
-            else
+            }
+            else {
                 Toast.makeText(c, getText(R.string.msg_login_fail), Toast.LENGTH_LONG).show();
-                */
+            }
         }
     }
 }
