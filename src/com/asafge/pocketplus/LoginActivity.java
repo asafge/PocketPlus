@@ -1,8 +1,5 @@
 package com.asafge.pocketplus;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
-
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -17,6 +14,7 @@ import android.widget.Toast;
 
 import com.noinnion.android.reader.api.ReaderException;
 import com.noinnion.android.reader.api.ReaderExtension;
+import com.noinnion.android.reader.api.util.Utils;
 import com.asafge.pocketplus.Prefs;
 
 public class LoginActivity extends Activity {
@@ -34,17 +32,19 @@ public class LoginActivity extends Activity {
 			Prefs.setLoggedIn(c, false);
 			Prefs.setSessionData(c, null);
 			setResult(ReaderExtension.RESULT_LOGOUT);
+			finish();
 		}
 		else if (Prefs.isLoggedIn(c)) {
 			setResult(ReaderExtension.RESULT_LOGIN);
+			finish();
 		}
 		else if (Prefs.getSessionData(c) == null) {
 			new GetRequestToken().execute();
 		}
 		else {
 			new GetAccessToken().execute();
+			Utils.startAppPackage(this, Prefs.NEWSPLUS_PACKAGE);
 		}
-		finish();
 	}
 
 	/*
@@ -78,17 +78,15 @@ public class LoginActivity extends Activity {
 				JSONObject json = Prefs.getSessionData(c);
 				if (json != null) {
 					Uri.Builder b = Uri.parse(APICall.API_URL_OAUTH_AUTHORIZE_APP).buildUpon();			
-					b.appendQueryParameter("request_token", URLEncoder.encode(json.getString("code"), "UTF-8"));
+					b.appendQueryParameter("request_token", json.getString("code"));
 					b.appendQueryParameter("redirect_uri", APICall.API_OAUTH_REDIRECT);
 					Intent launchBrowser = new Intent(Intent.ACTION_VIEW, b.build());
+					launchBrowser.setFlags(launchBrowser.getFlags() | Intent.FLAG_ACTIVITY_NO_HISTORY);
 					startActivity(launchBrowser);
 				}
 			}
 			catch (JSONException e) {
 				Prefs.setSessionData(c, null);
-				Log.e("Pocket+ Debug", e.getMessage());
-			}
-			catch (UnsupportedEncodingException e) {
 				Log.e("Pocket+ Debug", e.getMessage());
 			}
 		}
@@ -107,7 +105,7 @@ public class LoginActivity extends Activity {
 	            ac.addPostParam("consumer_key", APICall.API_OAUTH_CONSUMER_KEY);
 	            ac.addPostParam("code", Prefs.getSessionData(c).getString("code"));
 				ac.sync();
-				
+							
 				if (ac.Json.getString("access_token") != "") {
 					Prefs.setSessionData(c, ac.Json);
 					Prefs.setLoggedIn(c, true);
@@ -136,12 +134,10 @@ public class LoginActivity extends Activity {
         // On callback from the authorize API, show toast if failed or finish activity
         protected void onPostExecute(Boolean result) {
             final Context c = getApplicationContext();
-            if (result) {
-                finish();
+            if (!result) {
+            	Toast.makeText(c, getText(R.string.msg_login_fail), Toast.LENGTH_LONG).show();
             }
-            else {
-                Toast.makeText(c, getText(R.string.msg_login_fail), Toast.LENGTH_LONG).show();
-            }
+            finish();
         }
     }
 }
