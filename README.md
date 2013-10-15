@@ -1,4 +1,4 @@
-PocketPlus (0.0.1)
+PocketPlus (0.1)
 ==================
 
 A News+ extension for Pocket.
@@ -11,6 +11,13 @@ Features
 * Sync unread stories.
 * Sync favorite (starred) storries.
 * Handle read/unread requests.
+* Support for tagging stories. 
+
+TODO
+-------------------------------
+* Hide 'untagged' tag when editing tags.
+* Bulk operations for tags.
+* Auto-add images, videos tags.
 
 References
 -------------------------------
