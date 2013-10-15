@@ -22,45 +22,20 @@ public class OAuthActivity extends Activity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-//		String action = getIntent().getAction();
-		Context c = getApplicationContext();
-
-		setResult(RESULT_CANCELED);
 		
-		Log.e("Test", "OAUTH.onCreate");
+		Context c = getApplicationContext();
+		setResult(RESULT_CANCELED);
 		if (Prefs.getSessionData(c) == null) {
 			new GetRequestToken().execute();
 		}
 		else {
-//			Uri uri = getIntent().getData();
 			new GetAccessToken().execute();
 		}
 	}
 
-//	@Override
-//	protected void onResume() {
-//		super.onResume();
-//		// this must be places in activity#onResume()
-//		Uri uri = getIntent().getData();
-//		Log.e("Test", "Oauth.onResume: uri: " + uri);
-////		if (uri != null) {
-////			Log.e("Test", "test");
-////			setResult(ReaderExtension.RESULT_LOGIN);
-////			finish();
-////		}
-//	}
-
 	@Override
 	protected void onNewIntent (Intent intent) {
-		Log.e("Test", "message");
-//		super.onNewIntent(intent);
-		Uri uri = getIntent().getData();
-		Log.e("Test", "onNewIntent: uri: " + uri);
-		new GetAccessToken().execute();
-		
-//		if (uri != null) {
-//		}
-		
+		new GetAccessToken().execute();	
 	}
 	
 	/*
@@ -70,7 +45,6 @@ public class OAuthActivity extends Activity {
        
         // Get request token from Pocket API
 		protected Boolean doInBackground(Void... params) {
-			Log.e("Test", "GetRequestToken");
 			final Context c = getApplicationContext();
 			try {
 				APICall ac = new APICall(APICall.API_URL_OAUTH_REQUEST_TOKEN, c);
@@ -104,7 +78,6 @@ public class OAuthActivity extends Activity {
 					Log.e("Test", "request url: " + builder.toString());
 					Intent launchBrowser = new Intent(Intent.ACTION_VIEW, Uri.parse(builder.toString()));
 					launchBrowser.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
-//					launchBrowser.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 					startActivity(launchBrowser);
 				}
 			}
