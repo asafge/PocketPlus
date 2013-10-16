@@ -46,12 +46,21 @@ public class PocketPlus extends ReaderExtension {
 		try {
 			List<ISubscription> subs = new ArrayList<ISubscription>();
 			List<ITag> tags = new ArrayList<ITag>();
+
+			// Untagged "feed"
+			ISubscription untagged = new ISubscription();
+			untagged.title = APICall.POCKET_UNTAGGED_TITLE;
+			untagged.uid = APICall.POCKET_UNTAGGED_TITLE;
+			untagged.htmlUrl = APICall.POCKET_HOME_URL;
+			subs.add(untagged);
 			
-			ISubscription home = new ISubscription();
-			home.title = APICall.POCKET_HOME_TITLE;
-			home.uid = APICall.POCKET_HOME_TITLE;
-			home.htmlUrl = APICall.POCKET_HOME_URL;
-			subs.add(home);
+			// Tagged "feed"
+			ISubscription tagged = new ISubscription();
+			tagged.title = APICall.POCKET_TAGGED_TITLE;
+			tagged.uid = APICall.POCKET_TAGGED_TITLE;
+			tagged.htmlUrl = APICall.POCKET_HOME_URL;
+			subs.add(tagged);			
+			
 			subHandler.subscriptions(subs);
 			
 			tags.add(StarredTag.get());			
@@ -156,7 +165,6 @@ public class PocketPlus extends ReaderExtension {
 					String uid = (String)keys.next();
 					JSONObject story = item_list.getJSONObject(uid);
 					IItem item = new IItem();
-					item.subUid = APICall.POCKET_HOME_TITLE;
 					item.uid = uid;
 					item.title = story.getString("resolved_title");
 					item.link = story.getString("resolved_url");
@@ -174,10 +182,10 @@ public class PocketPlus extends ReaderExtension {
 							ITag tag = createTag((String)tag_keys.next(), false);
 							item.addTag(tag.uid, tag.label);
 						}
+						item.subUid = APICall.POCKET_TAGGED_TITLE;
 					}
 					else {
-						ITag tag = createTag("Untagged", false);
-						item.addTag(tag.uid, tag.label);
+						item.subUid = APICall.POCKET_UNTAGGED_TITLE;
 					}
 					
 					item.updatedTime = story.getLong("time_updated");
