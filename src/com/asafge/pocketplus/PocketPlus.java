@@ -222,7 +222,7 @@ public class PocketPlus extends ReaderExtension {
 			Iterator<?> image_keys = images.keys();
 			while (image_keys.hasNext()) {
 				JSONObject image = images.getJSONObject((String)image_keys.next());
-				item.addImage(image.getString("src"), "", image.getInt("width"), image.getInt("height"));
+				item.addImage(image.getString("src"), "image/*", image.getInt("width"), image.getInt("height"));
 			}
 		}
 		// Parse videos
