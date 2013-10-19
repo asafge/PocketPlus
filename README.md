@@ -1,8 +1,8 @@
-PocketPlus beta (0.1)
+PocketPlus beta (0.2)
 =====================
 
 A News+ extension for Pocket.
-This project is in very early stages and is in no way ready for daily use.
+This project is in early stages and should be considered as beta.
 
 
 Features
@@ -15,9 +15,7 @@ Features
 
 TODO
 -------------------------------
-* Hide 'untagged' tag when editing tags.
 * Bulk operations for tags.
-* Auto-add images, videos tags.
 
 References
 -------------------------------
