@@ -231,7 +231,7 @@ public class PocketPlus extends ReaderExtension {
 			Iterator<?> video_keys = videos.keys();
 			while (video_keys.hasNext()) {
 				JSONObject video = videos.getJSONObject((String)video_keys.next());
-				item.addVideo(video.getString("src"), "", video.getInt("width"), video.getInt("height"));
+				item.addVideo(video.getString("src"), "video/*", video.getInt("width"), video.getInt("height"));
 			}
 		}
 	}
