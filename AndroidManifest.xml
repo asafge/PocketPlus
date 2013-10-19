@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
 	package="com.asafge.pocketplus" android:installLocation="auto"
-	android:versionCode="3" android:versionName="0.1.1">
+	android:versionCode="4" android:versionName="0.2.0">
 
 	<uses-sdk android:minSdkVersion="8" android:targetSdkVersion="20" />
 
@@ -53,7 +53,9 @@
 			</intent-filter>
 		</activity>
 		
-       	<activity android:name="com.asafge.pocketplus.AddActivity" android:label="@string/add_to_pocketplus" android:configChanges="keyboardHidden|keyboard|orientation|screenSize" android:windowSoftInputMode="stateHidden|adjustPan">
+       	<activity android:name="com.asafge.pocketplus.AddActivity" android:label="@string/add_to_pocketplus" 
+       	    android:configChanges="keyboardHidden|keyboard|orientation|screenSize" 
+       	    android:windowSoftInputMode="stateHidden|adjustPan" android:theme="@style/Theme.Transparent">
 			<intent-filter>
 				<action android:name="android.intent.action.SEND" />
 				<category android:name="android.intent.category.DEFAULT" />
