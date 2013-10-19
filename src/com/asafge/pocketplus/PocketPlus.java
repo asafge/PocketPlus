@@ -54,13 +54,6 @@ public class PocketPlus extends ReaderExtension {
 			untagged.htmlUrl = APICall.POCKET_UNTAGGED_URL;
 			subs.add(untagged);
 			
-			// Tagged "feed"
-			ISubscription tagged = new ISubscription();
-			tagged.title = APICall.POCKET_HOME_TITLE;
-			tagged.uid = APICall.POCKET_HOME_TITLE;
-			tagged.htmlUrl = APICall.POCKET_HOME_URL;
-			subs.add(tagged);			
-			
 			subHandler.subscriptions(subs);
 			
 			tags.add(StarredTag.get());			
@@ -182,7 +175,6 @@ public class PocketPlus extends ReaderExtension {
 							ITag tag = createTag((String)tag_keys.next(), false);
 							item.addTag(tag.uid, tag.label);
 						}
-						item.subUid = APICall.POCKET_HOME_TITLE;
 					}
 					else {
 						item.subUid = APICall.POCKET_UNTAGGED_TITLE;

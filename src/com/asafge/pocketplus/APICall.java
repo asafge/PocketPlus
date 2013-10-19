@@ -127,8 +127,6 @@ public class APICall {
 	public static String API_URL_SEND = API_URL_BASE_SECURE + "v3/send";
 	
 	// Internal constants
-	public static String POCKET_HOME_TITLE = "Pocket | Tagged";
-	public static String POCKET_HOME_URL = "http://getpocket.com/a/queue/";
 	public static String POCKET_UNTAGGED_TITLE = "Pocket | Untagged";
 	public static String POCKET_UNTAGGED_URL = "http://getpocket.com/a/queue/grid/_untagged_/";
 }
