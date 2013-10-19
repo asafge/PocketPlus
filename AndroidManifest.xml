@@ -45,12 +45,19 @@
             android:label="@string/extension_name"
             android:launchMode="singleTask"
             android:exported="true" android:theme="@style/Theme.Sherlock.Light.Dialog">
-			
         	<intent-filter>
 				<action android:name="android.intent.action.VIEW"></action>
 				<category android:name="android.intent.category.DEFAULT"></category>
 				<category android:name="android.intent.category.BROWSABLE"></category>
 				<data android:scheme="pocketplus"></data>
+			</intent-filter>
+		</activity>
+		
+       	<activity android:name="com.asafge.pocketplus.AddActivity" android:label="@string/add_to_pocketplus" android:configChanges="keyboardHidden|keyboard|orientation|screenSize" android:windowSoftInputMode="stateHidden|adjustPan">
+			<intent-filter>
+				<action android:name="android.intent.action.SEND" />
+				<category android:name="android.intent.category.DEFAULT" />
+				<data android:mimeType="text/plain" />
 			</intent-filter>
 		</activity>
 

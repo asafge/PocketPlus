@@ -29,4 +29,9 @@
     <!-- Errors -->
     <string name="err_io">Network error</string>
     
+    <!-- Add -->
+    <string name="add_to_pocketplus">Add to Pocket+</string>
+    <string name="added_to_pocket">Added to Pocket</string>
+    <string name="not_added_to_pocket">Failed adding to Pocket</string>
+    
 </resources>
