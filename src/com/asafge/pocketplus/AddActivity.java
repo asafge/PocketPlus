@@ -32,7 +32,9 @@ public class AddActivity extends Activity {
 				new AddToPocket().execute(u.toString());
 			}
 			catch (MalformedURLException e) {
-				Log.e("Pocket+ Debug", "Add to Pocket+ Exception:" + e.getMessage()); 
+				Log.e("Pocket+ Debug", "Add to Pocket+ Exception:" + e.getMessage());
+				Context c = getApplicationContext();
+				Toast.makeText(c, getString(R.string.not_added_to_pocket_invalid), Toast.LENGTH_LONG).show();
 			}
 	    }
 	    finish();

@@ -33,5 +33,6 @@
     <string name="add_to_pocketplus">Add to Pocket+</string>
     <string name="added_to_pocket">Added to Pocket</string>
     <string name="not_added_to_pocket">Failed adding to Pocket</string>
+    <string name="not_added_to_pocket_invalid">Failed adding to Pocket - invalid URL given</string>
     
 </resources>
