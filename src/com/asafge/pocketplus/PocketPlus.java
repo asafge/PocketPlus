@@ -190,6 +190,9 @@ public class PocketPlus extends ReaderExtension {
 					
 					item.updatedTime = story.getLong("time_updated");
 					item.publishedTime = story.getLong("time_added");
+					
+					parseItemMedia(story, item);
+					
 					items.add(item);
 					
 					length += item.getLength();
@@ -209,6 +212,17 @@ public class PocketPlus extends ReaderExtension {
 		}
 		catch (RemoteException e) {
 			throw new ReaderException("SingleItem handler error", e);
+		}
+	}
+	
+	private void parseItemMedia(JSONObject story, IItem item) throws JSONException {
+		JSONObject images = story.optJSONObject("images");
+		if (images != null) {
+			Iterator<?> image_keys = images.keys();
+			while (image_keys.hasNext()) {
+				JSONObject image = images.getJSONObject((String)image_keys.next());
+				item.addImage(image.getString("src"), "", image.getInt("width"), image.getInt("height"));
+			}
 		}
 	}
 	
