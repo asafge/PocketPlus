@@ -257,7 +257,7 @@ public class PocketPlus extends ReaderExtension {
 				return ac.makeAuthenticated().syncGetResultOk();
 			}
 			else {
-				// TODO: Mark tag as read (using markAllAsRead function)
+				// Mark tag as read - not implemented due to API limitations
 				return false;
 			}
 		}
@@ -283,12 +283,12 @@ public class PocketPlus extends ReaderExtension {
 	}
 
 	/*
+	 * Not implemented in Pocket+ due to API limitations
 	 * Mark all stories on all feeds as read. Iterate all feeds in order to avoid marking excluded feeds as read. 
 	 * Note: S = subscription (feed), t = tag
 	 */
 	@Override
 	public boolean markAllAsRead(String arg0, String arg1, String[] arg2, long arg3) throws IOException, ReaderException {
-		// TODO: mark tag as read
 		return false;
 	}
 
@@ -346,28 +346,27 @@ public class PocketPlus extends ReaderExtension {
 	}
 
 	/*
-	 * Rename a top level tag both in News+ and in Pocket server
+	 * Not implemented in Pocket+ due to API limitations
+	 * Rename a top level tag both in News+ and in the server
 	 */
 	@Override
 	public boolean renameTag(String tagUid, String oldLabel, String newLabel) throws IOException, ReaderException {
-		// TODO
 		return false;
 	}
 	
 	/*
-	 * Delete a top level tag both in News+ and in Pocket server
-	 * This just removes the tag, not the feeds in it
+	 * Not implemented in Pocket+ due to API limitations
+	 * Delete a top level tag both in News+ and in the server
 	 */
 	@Override
 	public boolean disableTag(String tagUid, String label) throws IOException, ReaderException {
-		if (tagUid.startsWith("STAR:"))
-			return false;
 		return false;
 	}
 	
 
 	/* 
-	 * Not implemented in Pocket+ - editing subscriptions (add/delete/rename/change-folder)
+	 * Not implemented in Pocket+ due to API limitations
+	 * Editing feeds (add/delete/rename/change-folder)
 	 */
 	@Override
 	public boolean editSubscription(String arg0, String arg1, String arg2,
