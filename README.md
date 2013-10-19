@@ -13,11 +13,8 @@ Features
 * Handle read/unread requests.
 * Support for tagging stories. 
 
-TODO
--------------------------------
-* Bulk operations for tags.
-
 References
 -------------------------------
+* Download - https://play.google.com/store/apps/details?id=com.asafge.pocketplus
 * News+ - https://github.com/noinnion/newsplus
 * Pocket API - http://getpocket.com/developer/
