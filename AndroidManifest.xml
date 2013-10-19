@@ -38,7 +38,7 @@
         		
         <activity android:name="com.asafge.pocketplus.LoginActivity"
             android:label="@string/extension_login_title"
-            android:exported="true" android:theme="@style/Theme.Sherlock.Light.Dialog">			
+            android:exported="true" android:theme="@style/Theme.Transparent">			
 		</activity>
 
         <activity android:name="com.asafge.pocketplus.OAuthActivity"
