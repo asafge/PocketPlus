@@ -216,12 +216,22 @@ public class PocketPlus extends ReaderExtension {
 	}
 	
 	private void parseItemMedia(JSONObject story, IItem item) throws JSONException {
+		// Parse images
 		JSONObject images = story.optJSONObject("images");
 		if (images != null) {
 			Iterator<?> image_keys = images.keys();
 			while (image_keys.hasNext()) {
 				JSONObject image = images.getJSONObject((String)image_keys.next());
 				item.addImage(image.getString("src"), "", image.getInt("width"), image.getInt("height"));
+			}
+		}
+		// Parse videos
+		JSONObject videos = story.optJSONObject("videos");
+		if (videos != null) {
+			Iterator<?> video_keys = videos.keys();
+			while (video_keys.hasNext()) {
+				JSONObject video = videos.getJSONObject((String)video_keys.next());
+				item.addVideo(video.getString("src"), "", video.getInt("width"), video.getInt("height"));
 			}
 		}
 	}
