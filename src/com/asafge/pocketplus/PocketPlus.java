@@ -207,6 +207,9 @@ public class PocketPlus extends ReaderExtension {
 		}
 	}
 	
+	/*
+	 * A helper function for parseItemList - will parse images/videos of a single story
+	 */
 	private void parseItemMedia(JSONObject story, IItem item) throws JSONException {
 		// Parse images
 		JSONObject images = story.optJSONObject("images");
