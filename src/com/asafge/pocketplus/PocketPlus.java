@@ -217,7 +217,7 @@ public class PocketPlus extends ReaderExtension {
 			Iterator<?> image_keys = images.keys();
 			while (image_keys.hasNext()) {
 				JSONObject image = images.getJSONObject((String)image_keys.next());
-				item.addImage(image.getString("src"), "image/*", image.getInt("width"), image.getInt("height"));
+				item.addImage(image.getString("src"), "image/*", image.getInt("width"), image.getInt("height"), 0);
 			}
 		}
 		// Parse videos
@@ -303,33 +303,40 @@ public class PocketPlus extends ReaderExtension {
 	 * Edit an item's tag - starring/unstarring items, or changing string-tags
 	 */
 	@Override
-	public boolean editItemTag(String[] itemUids, String[] subUids, String[] addTags, String[] removeTags) throws IOException, ReaderException {
+	public boolean editItemTag(String[] itemUids, String[] subUids, String[] tags, int action) throws IOException, ReaderException {
 		try {
 			APICall ac = new APICall(APICall.API_URL_SEND, c);
 			JSONArray list = new JSONArray();
 			for (int i=0; i<itemUids.length; i++) {
-				JSONObject action = new JSONObject();
-				action.put("item_id", itemUids[i]);
-
-				if (addTags != null) {
-					if (addTags[i].startsWith(StarredTag.get().uid)) { 
-						action.put("action", "favorite");
-					}
-					else {
-						action.put("action", "tags_add");
-						action.put("tags", new JSONArray().put(addTags[i].replace("TAG:", "")));
-					}
+				JSONObject action_obj = new JSONObject();
+				action_obj.put("item_id", itemUids[i]);
+				
+				switch (action) {
+					case ReaderExtension.ACTION_ITEM_TAG_ADD_LABEL:
+						if (tags[i].startsWith(StarredTag.get().uid)) { 
+							action_obj.put("action", "favorite");
+						}
+						else {
+							action_obj.put("action", "tags_add");
+							action_obj.put("tags", new JSONArray().put(tags[i].replace("TAG:", "")));
+						}
+						break;
+					case ReaderExtension.ACTION_ITEM_TAG_REMOVE_LABEL:
+						if (tags[i].startsWith(StarredTag.get().uid)) { 
+							action_obj.put("action", "unfavorite");
+						}
+						else {
+							action_obj.put("action", "tags_remove");
+							action_obj.put("tags", new JSONArray().put(tags[i].replace("TAG:", "")));
+						}
+						break;
+					case ReaderExtension.ACTION_ITEM_TAG_NEW_LABEL:
+						return true;
+					default:
+						Log.e("Pocket+ Debug", "Unknown action: " + String.valueOf(action));
+						return false;
 				}
-				if (removeTags != null) {
-					if (removeTags[i].startsWith(StarredTag.get().uid)) { 
-						action.put("action", "unfavorite");
-					}
-					else {
-						action.put("action", "tags_remove");
-						action.put("tags", new JSONArray().put(removeTags[i].replace("TAG:", "")));
-					}
-				}
-				list.put(action);
+				list.put(action_obj);
 			}
 			ac.addPostParam("actions", list.toString());
 			return ac.makeAuthenticated().syncGetResultOk();
@@ -357,7 +364,6 @@ public class PocketPlus extends ReaderExtension {
 	public boolean disableTag(String tagUid, String label) throws IOException, ReaderException {
 		return false;
 	}
-	
 
 	/* 
 	 * Not implemented in Pocket+ due to API limitations
@@ -365,7 +371,7 @@ public class PocketPlus extends ReaderExtension {
 	 */
 	@Override
 	public boolean editSubscription(String arg0, String arg1, String arg2,
-			String[] arg3, int arg4, long arg5) throws IOException,
+			String[] arg3, int arg4) throws IOException,
 			ReaderException {
 		return false;
 	}
