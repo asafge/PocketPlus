@@ -310,31 +310,30 @@ public class PocketPlus extends ReaderExtension {
 			for (int i=0; i<itemUids.length; i++) {
 				JSONObject action_obj = new JSONObject();
 				action_obj.put("item_id", itemUids[i]);
-				
-				switch (action) {
-					case ReaderExtension.ACTION_ITEM_TAG_ADD_LABEL:
-						if (tags[i].startsWith(StarredTag.get().uid)) { 
-							action_obj.put("action", "favorite");
-						}
-						else {
-							action_obj.put("action", "tags_add");
-							action_obj.put("tags", new JSONArray().put(tags[i].replace("TAG:", "")));
-						}
-						break;
-					case ReaderExtension.ACTION_ITEM_TAG_REMOVE_LABEL:
-						if (tags[i].startsWith(StarredTag.get().uid)) { 
-							action_obj.put("action", "unfavorite");
-						}
-						else {
-							action_obj.put("action", "tags_remove");
-							action_obj.put("tags", new JSONArray().put(tags[i].replace("TAG:", "")));
-						}
-						break;
-					case ReaderExtension.ACTION_ITEM_TAG_NEW_LABEL:
-						return true;
-					default:
-						Log.e("Pocket+ Debug", "Unknown action: " + String.valueOf(action));
-						return false;
+
+				if (action == ReaderExtension.ACTION_ITEM_TAG_ADD_LABEL ||
+					action == ReaderExtension.ACTION_ITEM_TAG_NEW_LABEL) {
+					if (tags[i].startsWith(StarredTag.get().uid)) { 
+						action_obj.put("action", "favorite");
+					}
+					else {
+						action_obj.put("action", "tags_add");
+						action_obj.put("tags", new JSONArray().put(tags[i].replace("TAG:", "")));
+					}
+				}
+				else if (action == ReaderExtension.ACTION_ITEM_TAG_REMOVE_LABEL) {
+					if (tags[i].startsWith(StarredTag.get().uid)) { 
+						action_obj.put("action", "unfavorite");
+					}
+					else {
+						action_obj.put("action", "tags_remove");
+						action_obj.put("tags", new JSONArray().put(tags[i].replace("TAG:", "")));
+					}
+					break;
+				}
+				else {
+					Log.e("Pocket+ Debug", "Unknown action: " + String.valueOf(action));
+					return false;
 				}
 				list.put(action_obj);
 			}
