@@ -311,8 +311,7 @@ public class PocketPlus extends ReaderExtension {
 				JSONObject action_obj = new JSONObject();
 				action_obj.put("item_id", itemUids[i]);
 
-				if (action == ReaderExtension.ACTION_ITEM_TAG_ADD_LABEL ||
-					action == ReaderExtension.ACTION_ITEM_TAG_NEW_LABEL) {
+				if (action == ReaderExtension.ACTION_ITEM_TAG_ADD_LABEL) {
 					if (tags[i].startsWith(StarredTag.get().uid)) { 
 						action_obj.put("action", "favorite");
 					}
@@ -330,6 +329,14 @@ public class PocketPlus extends ReaderExtension {
 						action_obj.put("tags", new JSONArray().put(tags[i].replace("TAG:", "")));
 					}
 					break;
+				}
+				else if (action == ReaderExtension.ACTION_ITEM_TAG_NEW_LABEL) {
+					JSONArray ja = new JSONArray();
+					foreach (String tag: tags) {
+						ja.put(tag);
+					}
+					action_obj.put("tags", ja);
+					action_obj.put("action", "tags_add");
 				}
 				else {
 					Log.e("Pocket+ Debug", "Unknown action: " + String.valueOf(action));
