@@ -27,6 +27,7 @@ import com.noinnion.android.reader.api.provider.ITag;
 
 public class PocketPlus extends ReaderExtension {
 	private Context c;
+	private boolean force_refresh_tags = false;
 	
 	/*
 	 * Constructor
@@ -58,6 +59,15 @@ public class PocketPlus extends ReaderExtension {
 			
 			tags.add(StarredTag.get());			
 			tagHandler.tags(tags);
+			
+			if (force_refresh_tags) {
+				APICall ac = new APICall(APICall.API_URL_GET, c);
+				ac.addPostParam("state", "unread");
+				ac.addPostParam("detailType", "complete");
+				ac.makeAuthenticated().sync();
+				parseTagList(ac.Json, tags);
+				force_refresh_tags = false;
+			}
 		}
 		catch (RemoteException e) {
 			throw new ReaderException("Sub/tag handler error", e);
@@ -112,6 +122,35 @@ public class PocketPlus extends ReaderExtension {
 		catch (RemoteException e) {
 			throw new ReaderException("SingleItem handler error", e);
 		}
+	}
+	
+	/*
+	 * Parse an array of items to get the available tags, from the Pocket JSON object.
+	 */
+	public void parseTagList(JSONObject json, List<ITag> tags) throws ReaderException {
+		try {
+			JSONObject item_list = json.optJSONObject("list");
+			if (item_list != null) {
+				Iterator<?> keys = item_list.keys();
+				while (keys.hasNext()) {
+					JSONObject story = item_list.getJSONObject((String)keys.next());
+					JSONObject json_tags = story.optJSONObject("tags");
+					if (json_tags != null) {
+						Iterator<?> tag_keys = json_tags.keys();
+						while (tag_keys.hasNext()) {
+							ITag tag = createTag((String)tag_keys.next(), false);
+							tags.add(tag);
+						}
+					}
+				}
+			}
+		}
+		catch (JSONException e) {
+			Log.e("Pocket+ Debug", "JSONExceotion: " + e.getMessage());
+			Log.e("Pocket+ Debug", "JSON: " + json.toString());
+			throw new ReaderException("ParseTagList parse error", e);
+		}
+			
 	}
 	
 	/*
@@ -332,11 +371,12 @@ public class PocketPlus extends ReaderExtension {
 				}
 				else if (action == ReaderExtension.ACTION_ITEM_TAG_NEW_LABEL) {
 					JSONArray ja = new JSONArray();
-					foreach (String tag: tags) {
+					for (String tag: tags) {
 						ja.put(tag);
 					}
 					action_obj.put("tags", ja);
 					action_obj.put("action", "tags_add");
+					force_refresh_tags = true;
 				}
 				else {
 					Log.e("Pocket+ Debug", "Unknown action: " + String.valueOf(action));
