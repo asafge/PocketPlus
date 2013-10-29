@@ -2,6 +2,7 @@ package com.asafge.pocketplus;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
@@ -27,7 +28,7 @@ import com.noinnion.android.reader.api.provider.ITag;
 
 public class PocketPlus extends ReaderExtension {
 	private Context c;
-	private boolean force_refresh_tags = false;
+	private List<String> new_tags_workaround = new ArrayList<String>();
 	
 	/*
 	 * Constructor
@@ -54,20 +55,17 @@ public class PocketPlus extends ReaderExtension {
 			untagged.uid = APICall.POCKET_UNTAGGED_TITLE;
 			untagged.htmlUrl = APICall.POCKET_UNTAGGED_URL;
 			subs.add(untagged);
-			
 			subHandler.subscriptions(subs);
 			
-			tags.add(StarredTag.get());			
-			tagHandler.tags(tags);
-			
-			if (force_refresh_tags) {
-				APICall ac = new APICall(APICall.API_URL_GET, c);
-				ac.addPostParam("state", "unread");
-				ac.addPostParam("detailType", "complete");
-				ac.makeAuthenticated().sync();
-				parseTagList(ac.Json, tags);
-				force_refresh_tags = false;
+			// Workaround for adding new tags
+			for (String tag: new_tags_workaround) {
+				if (tag.length() > 0) {
+					tags.add(createTag(tag, false));
+				}
 			}
+			new_tags_workaround = new ArrayList<String>();
+			tags.add(StarredTag.get());
+			tagHandler.tags(tags);	
 		}
 		catch (RemoteException e) {
 			throw new ReaderException("Sub/tag handler error", e);
@@ -122,35 +120,6 @@ public class PocketPlus extends ReaderExtension {
 		catch (RemoteException e) {
 			throw new ReaderException("SingleItem handler error", e);
 		}
-	}
-	
-	/*
-	 * Parse an array of items to get the available tags, from the Pocket JSON object.
-	 */
-	public void parseTagList(JSONObject json, List<ITag> tags) throws ReaderException {
-		try {
-			JSONObject item_list = json.optJSONObject("list");
-			if (item_list != null) {
-				Iterator<?> keys = item_list.keys();
-				while (keys.hasNext()) {
-					JSONObject story = item_list.getJSONObject((String)keys.next());
-					JSONObject json_tags = story.optJSONObject("tags");
-					if (json_tags != null) {
-						Iterator<?> tag_keys = json_tags.keys();
-						while (tag_keys.hasNext()) {
-							ITag tag = createTag((String)tag_keys.next(), false);
-							tags.add(tag);
-						}
-					}
-				}
-			}
-		}
-		catch (JSONException e) {
-			Log.e("Pocket+ Debug", "JSONExceotion: " + e.getMessage());
-			Log.e("Pocket+ Debug", "JSON: " + json.toString());
-			throw new ReaderException("ParseTagList parse error", e);
-		}
-			
 	}
 	
 	/*
@@ -343,53 +312,49 @@ public class PocketPlus extends ReaderExtension {
 	 */
 	@Override
 	public boolean editItemTag(String[] itemUids, String[] subUids, String[] tags, int action) throws IOException, ReaderException {
-		try {
+		if (action == ReaderExtension.ACTION_ITEM_TAG_NEW_LABEL) {
+			new_tags_workaround = Arrays.asList(tags);
+			return true;
+		}
+		else {
 			APICall ac = new APICall(APICall.API_URL_SEND, c);
 			JSONArray list = new JSONArray();
-			for (int i=0; i<itemUids.length; i++) {
-				JSONObject action_obj = new JSONObject();
-				action_obj.put("item_id", itemUids[i]);
-
-				if (action == ReaderExtension.ACTION_ITEM_TAG_ADD_LABEL) {
-					if (tags[i].startsWith(StarredTag.get().uid)) { 
-						action_obj.put("action", "favorite");
+			try {
+				for (int i=0; i<itemUids.length; i++) {
+					JSONObject action_obj = new JSONObject();
+					action_obj.put("item_id", itemUids[i]);
+	
+					if (action == ReaderExtension.ACTION_ITEM_TAG_ADD_LABEL) {
+						if (tags[i].startsWith(StarredTag.get().uid)) { 
+							action_obj.put("action", "favorite");
+						}
+						else {
+							action_obj.put("action", "tags_add");
+							action_obj.put("tags", new JSONArray().put(tags[i].replace("TAG:", "")));
+						}
+					}
+					else if (action == ReaderExtension.ACTION_ITEM_TAG_REMOVE_LABEL) {
+						if (tags[i].startsWith(StarredTag.get().uid)) { 
+							action_obj.put("action", "unfavorite");
+						}
+						else {
+							action_obj.put("action", "tags_remove");
+							action_obj.put("tags", new JSONArray().put(tags[i].replace("TAG:", "")));
+						}
 					}
 					else {
-						action_obj.put("action", "tags_add");
-						action_obj.put("tags", new JSONArray().put(tags[i].replace("TAG:", "")));
+						Log.e("Pocket+ Debug", "Unknown action: " + String.valueOf(action));
+						return false;
 					}
+					list.put(action_obj);
 				}
-				else if (action == ReaderExtension.ACTION_ITEM_TAG_REMOVE_LABEL) {
-					if (tags[i].startsWith(StarredTag.get().uid)) { 
-						action_obj.put("action", "unfavorite");
-					}
-					else {
-						action_obj.put("action", "tags_remove");
-						action_obj.put("tags", new JSONArray().put(tags[i].replace("TAG:", "")));
-					}
-					break;
-				}
-				else if (action == ReaderExtension.ACTION_ITEM_TAG_NEW_LABEL) {
-					JSONArray ja = new JSONArray();
-					for (String tag: tags) {
-						ja.put(tag);
-					}
-					action_obj.put("tags", ja);
-					action_obj.put("action", "tags_add");
-					force_refresh_tags = true;
-				}
-				else {
-					Log.e("Pocket+ Debug", "Unknown action: " + String.valueOf(action));
-					return false;
-				}
-				list.put(action_obj);
+				ac.addPostParam("actions", list.toString());
+				return ac.makeAuthenticated().syncGetResultOk();
 			}
-			ac.addPostParam("actions", list.toString());
-			return ac.makeAuthenticated().syncGetResultOk();
-		}
-		catch (JSONException e) {
-			Log.e("Pocket+ Debug", "JSONExceotion: " + e.getMessage());
-			return false;
+			catch (JSONException e) {
+				Log.e("Pocket+ Debug", "JSONExceotion: " + e.getMessage());
+				return false;
+			}
 		}
 	}
 
