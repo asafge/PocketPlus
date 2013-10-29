@@ -105,7 +105,7 @@ public class PocketPlus extends ReaderExtension {
 	/*
 	 * Parse an array of items to get the IDs, from the Pocket JSON object.
 	 */
-	public void parseIDList(JSONObject json, IItemIdListHandler handler) throws ReaderException {
+	private void parseIDList(JSONObject json, IItemIdListHandler handler) throws ReaderException {
 		try {
 			List<String> items = new ArrayList<String>();
 			JSONObject item_list = json.optJSONObject("list");
@@ -155,7 +155,7 @@ public class PocketPlus extends ReaderExtension {
 	/*
 	 * Parse an array of items that are in the Pocket JSON format.
 	 */
-	public void parseItemList(JSONObject json, IItemListHandler handler) throws ReaderException {
+	private void parseItemList(JSONObject json, IItemListHandler handler) throws ReaderException {
 		try {
 			int length = 0;
 			List<IItem> items = new ArrayList<IItem>();
@@ -378,9 +378,7 @@ public class PocketPlus extends ReaderExtension {
 	 * Editing feeds (add/delete/rename/change-folder)
 	 */
 	@Override
-	public boolean editSubscription(String arg0, String arg1, String arg2,
-			String[] arg3, int arg4) throws IOException,
-			ReaderException {
+	public boolean editSubscription(String arg0, String arg1, String arg2, String[] arg3, int arg4) throws ReaderException {
 		return false;
 	}
 }
