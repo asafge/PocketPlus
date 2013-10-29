@@ -173,9 +173,10 @@ public class PocketPlus extends ReaderExtension {
 					item.read = (story.getInt("status") != 0);
 					item.starred = (story.getString("favorite").startsWith("1"));
 					item.content = story.getString("excerpt");
+					item.updatedTime = story.getLong("time_updated");
+					item.publishedTime = story.getLong("time_added");
 					if (item.starred)
-						item.addTag(StarredTag.get().uid);
-					
+						item.addTag(StarredTag.get().uid);					
 					JSONObject tags = story.optJSONObject("tags");
 					if (tags != null) {
 						Iterator<?> tag_keys = tags.keys();
@@ -186,11 +187,7 @@ public class PocketPlus extends ReaderExtension {
 					}
 					else {
 						item.subUid = APICall.POCKET_UNTAGGED_TITLE;
-					}
-					
-					item.updatedTime = story.getLong("time_updated");
-					item.publishedTime = story.getLong("time_added");
-					
+					}				
 					parseItemMedia(story, item);
 					
 					items.add(item);
