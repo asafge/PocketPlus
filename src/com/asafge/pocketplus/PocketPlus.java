@@ -303,7 +303,7 @@ public class PocketPlus extends ReaderExtension {
 		tag.label = name;
 		String prefix = isStar ? "STAR" : "TAG";
 		tag.uid = name = (prefix + ":" + name);
-		tag.type = isStar ? ITag.TYPE_TAG_STARRED : ITag.TYPE_FOLDER;
+		tag.type = isStar ? ITag.TYPE_TAG_STARRED : ITag.TYPE_TAG_LABEL;
 		return tag;
 	}
 	
