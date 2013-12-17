@@ -23,7 +23,6 @@ import com.noinnion.android.reader.api.internal.IItemListHandler;
 import com.noinnion.android.reader.api.internal.ISubscriptionListHandler;
 import com.noinnion.android.reader.api.internal.ITagListHandler;
 import com.noinnion.android.reader.api.provider.IItem;
-import com.noinnion.android.reader.api.provider.ISubscription;
 import com.noinnion.android.reader.api.provider.ITag;
 
 public class PocketPlus extends ReaderExtension {
