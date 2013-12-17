@@ -46,17 +46,8 @@ public class PocketPlus extends ReaderExtension {
 	@Override
 	public void handleReaderList(ITagListHandler tagHandler, ISubscriptionListHandler subHandler, long syncTime) throws ReaderException {
 		try {
-			List<ISubscription> subs = new ArrayList<ISubscription>();
 			List<ITag> tags = new ArrayList<ITag>();
 
-			// Untagged "feed"
-			ISubscription untagged = new ISubscription();
-			untagged.title = APICall.POCKET_UNTAGGED_TITLE;
-			untagged.uid = APICall.POCKET_UNTAGGED_TITLE;
-			untagged.htmlUrl = APICall.POCKET_UNTAGGED_URL;
-			subs.add(untagged);
-			subHandler.subscriptions(subs);
-			
 			// Workaround for adding new tags
 			for (String tag: new_tags_workaround) {
 				if (tag.length() > 0) {
@@ -65,6 +56,7 @@ public class PocketPlus extends ReaderExtension {
 			}
 			new_tags_workaround = new ArrayList<String>();
 			tags.add(StarredTag.get());
+			tags.add(UntaggedTag.get());
 			tagHandler.tags(tags);	
 		}
 		catch (RemoteException e) {
@@ -184,9 +176,10 @@ public class PocketPlus extends ReaderExtension {
 							ITag tag = createTag((String)tag_keys.next(), false);
 							item.addTag(tag.uid, tag.label);
 						}
+						item.subUid = null;
 					}
 					else {
-						item.subUid = APICall.POCKET_UNTAGGED_TITLE;
+						item.addTag(UntaggedTag.get().uid);
 					}				
 					parseItemMedia(story, item);
 					
