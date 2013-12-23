@@ -1,5 +1,5 @@
-PocketPlus beta (0.2)
-=====================
+PocketPlus (0.2)
+================
 
 A News+ extension for Pocket.
 This project is in early stages and should be considered as beta.
