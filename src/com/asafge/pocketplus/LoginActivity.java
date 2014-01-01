@@ -7,12 +7,13 @@ import android.os.Bundle;
 import android.util.Log;
 
 import com.noinnion.android.reader.api.ReaderExtension;
+import com.noinnion.android.reader.api.util.Utils;
 
 public class LoginActivity extends Activity {
 
-	public final static int		REQUEST_OAUTH = 1;
-	
-	/* 
+    public static final String NEWSPLUS_PACKAGE = "com.noinnion.android.newsplus";
+
+    /*
 	 * Authenticate or logout
 	 */
 	@Override
@@ -34,7 +35,7 @@ public class LoginActivity extends Activity {
 		}
 		else {
 			Intent intent = new Intent(this, OAuthActivity.class);
-			startActivityForResult(intent, REQUEST_OAUTH);
+            startActivity(intent);
 		}
 	}
 
@@ -45,6 +46,7 @@ public class LoginActivity extends Activity {
 		final Context c = getApplicationContext();
 		if (Prefs.isLoggedIn(c)) {
 			setResult(ReaderExtension.RESULT_LOGIN);
+            Utils.startAppPackage(this, NEWSPLUS_PACKAGE);
 			finish();
 		}
 	}
