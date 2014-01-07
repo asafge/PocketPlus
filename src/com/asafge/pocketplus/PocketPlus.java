@@ -287,9 +287,10 @@ public class PocketPlus extends ReaderExtension {
 	 */
 	public static ITag createTag(String name, boolean isStar) {
 		ITag tag = new ITag();
+        name = name.toUpperCase();
 		tag.label = name;
 		String prefix = isStar ? "STAR" : "TAG";
-		tag.uid = name = (prefix + ":" + name);
+		tag.uid = (prefix + ":" + name);
 		tag.type = isStar ? ITag.TYPE_TAG_STARRED : ITag.TYPE_TAG_LABEL;
 		return tag;
 	}
