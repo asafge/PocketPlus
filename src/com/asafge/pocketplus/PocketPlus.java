@@ -14,8 +14,6 @@ import android.content.Context;
 import android.os.RemoteException;
 import android.util.Log;
 
-import com.asafge.pocketplus.APICall;
-import com.asafge.pocketplus.StarredTag;
 import com.noinnion.android.reader.api.ReaderException;
 import com.noinnion.android.reader.api.ReaderExtension;
 import com.noinnion.android.reader.api.internal.IItemIdListHandler;
