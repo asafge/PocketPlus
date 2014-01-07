@@ -52,7 +52,7 @@ public class AddActivity extends Activity {
 				return ac.makeAuthenticated().syncGetResultOk();
 			}
 			catch (ReaderException e) {
-				Log.e("Pocket+ Debug", "JSONExceotion: " + e.getMessage());
+				Log.e("Pocket+ Debug", "JSONException: " + e.getMessage());
 				return false;
 			}
 		}

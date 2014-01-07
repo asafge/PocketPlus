@@ -193,7 +193,7 @@ public class PocketPlus extends ReaderExtension {
 			}
 		}
 		catch (JSONException e) {
-			Log.e("Pocket+ Debug", "JSONExceotion: " + e.getMessage());
+			Log.e("Pocket+ Debug", "JSONException: " + e.getMessage());
 			Log.e("Pocket+ Debug", "JSON: " + json.toString());
 			throw new ReaderException("ParseItemList parse error", e);
 		}
@@ -340,7 +340,7 @@ public class PocketPlus extends ReaderExtension {
 				return ac.makeAuthenticated().syncGetResultOk();
 			}
 			catch (JSONException e) {
-				Log.e("Pocket+ Debug", "JSONExceotion: " + e.getMessage());
+				Log.e("Pocket+ Debug", "JSONException: " + e.getMessage());
 				return false;
 			}
 		}
