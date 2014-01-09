@@ -79,6 +79,11 @@ public class APICall {
 			Prefs.setLoggedIn(c, false);
 			throw new ReaderException("User not authenticated");
 		}
+        catch (NullPointerException e) {
+            Prefs.setSessionData(c, null);
+            Prefs.setLoggedIn(c, false);
+            throw new ReaderException("User not authenticated");
+        }
 	}
 	
 	// Run synchronous HTTP request and check for valid response
@@ -89,14 +94,22 @@ public class APICall {
 		aquery.sync(callback);
 		Json = callback.getResult();
 		Status = callback.getStatus();
+        int status_code = Status.getCode();
+        if ((status_code == 401) || (status_code == 403)) {
+            final Context c = aquery.getContext();
+            Prefs.setSessionData(c, null);
+            Prefs.setLoggedIn(c, false);
+            throw new ReaderException("User not authenticated");
+        }
+        if (status_code != 200)
+            throw new ReaderException("OAuth process error");
 		if (Json == null) {
 			Log.e("Pocket+ Debug", "URL: " + callbackUrl);
 			Log.e("Pocket+ Debug", "Status: " + Status.getMessage() + " | " + String.valueOf(Status.getCode()));
 			Log.e("Pocket+ Debug", "Session Data: " + Prefs.getSessionData(aquery.getContext()));
 			throw new ReaderException("Pocket server unreachable");
 		}
-		if (Status.getCode() != 200)
-			throw new ReaderException("OAuth process error");
+
 	}
 		
 	// Run synchronous HTTP request, check valid response + successful operation 
