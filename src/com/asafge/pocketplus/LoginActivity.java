@@ -12,6 +12,7 @@ import com.noinnion.android.reader.api.util.Utils;
 public class LoginActivity extends Activity {
 
     public static final String NEWSPLUS_PACKAGE = "com.noinnion.android.newsplus";
+    public final static int    REQUEST_OAUTH = 1;
 
     /*
 	 * Authenticate or logout
@@ -35,7 +36,7 @@ public class LoginActivity extends Activity {
 		}
 		else {
 			Intent intent = new Intent(this, OAuthActivity.class);
-            startActivity(intent);
+            startActivityForResult(intent, REQUEST_OAUTH);
 		}
 	}
 
