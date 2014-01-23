@@ -156,12 +156,12 @@ public class PocketPlus extends ReaderExtension {
 					JSONObject story = item_list.getJSONObject(uid);
 					IItem item = new IItem();
 					item.uid = uid;
-					item.title = story.getString("resolved_title");
-					item.link = story.getString("resolved_url");
+					item.title = getFirstStringSafe(story, new String[] {"resolved_title", "given_title"});
+					item.link = getFirstStringSafe(story, new String[] {"resolved_url", "given_url"});
 					item.id = Long.parseLong(uid);
 					item.read = (story.getInt("status") != 0);
 					item.starred = (story.getString("favorite").startsWith("1"));
-					item.content = story.getString("excerpt");
+					item.content =  getFirstStringSafe(story, new String[] {"excerpt"});
 					item.updatedTime = story.getLong("time_updated");
 					item.publishedTime = story.getLong("time_added");
 					if (item.starred)
@@ -201,6 +201,20 @@ public class PocketPlus extends ReaderExtension {
 			throw new ReaderException("SingleItem handler error", e);
 		}
 	}
+
+    /*
+    On a JSON object, get the first string for which a key in 'choices' exists
+     */
+    private String getFirstStringSafe(JSONObject story, String[] choices) {
+        for (String choice : choices) {
+            try {
+                return story.getString(choice);
+            }
+            catch (JSONException e) {
+            }
+        }
+        return "";
+    }
 	
 	/*
 	 * A helper function for parseItemList - will parse images/videos of a single story
