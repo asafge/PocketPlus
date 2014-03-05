@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
 	package="com.asafge.pocketplus" android:installLocation="auto"
-	android:versionCode="12" android:versionName="0.2.8">
+	android:versionCode="13" android:versionName="0.3.0">
 
 	<uses-sdk android:minSdkVersion="8" android:targetSdkVersion="20" />
 
@@ -34,12 +34,15 @@
 			<meta-data android:name="protocolVersion" android:value="1" />
 			<meta-data android:name="description" android:value="@string/extension_description" />
 			<meta-data android:name="loginActivity" android:value=".LoginActivity" />
+            <meta-data android:name="settingsActivity" android:value=".SettingsActivity" />
 		</service>
         		
         <activity android:name="com.asafge.pocketplus.LoginActivity"
             android:label="@string/extension_login_title"
             android:exported="true" android:theme="@style/Theme.Transparent">			
 		</activity>
+
+        <activity android:name=".SettingsActivity" android:exported="true" />
 
         <activity android:name="com.asafge.pocketplus.OAuthActivity"
             android:label="@string/extension_name"

@@ -14,17 +14,10 @@
 		    android:contentDescription="@string/app_name"
 		    android:src="@drawable/logo" />
 
-		<TextView
-		    android:layout_width="wrap_content"
-		    android:layout_height="wrap_content"
-		    android:layout_gravity="center_horizontal"
-		    android:layout_marginTop="20dp"
-		    android:focusable="true"
-		    android:paddingBottom="8dp"
-		    android:text="@string/welcome_title"
-		    android:textColor="#333"
-		    android:textSize="18sp"
-		    android:textStyle="bold" />
+        <TextView android:layout_height="wrap_content"
+            android:layout_width="wrap_content" android:layout_gravity="center_horizontal"
+            android:layout_marginTop="20dp" android:text="@string/extension_name"
+            android:textStyle="bold" android:textColor="#333" android:textSize="18sp" />
 
 		<TextView
 		    android:layout_width="wrap_content"
@@ -46,8 +39,24 @@
 			    android:enabled="false"
 			    android:textColor="#333" />
 
-		</LinearLayout>
+        </LinearLayout>
 
-	</LinearLayout>
+        <CheckBox android:id="@+id/hide_icon" android:layout_height="wrap_content"
+            android:layout_width="wrap_content" android:layout_gravity="center_horizontal"
+            android:text="@string/txt_hide_icon" />
+
+        <TextView android:id="@+id/changelog" android:layout_height="wrap_content"
+            android:layout_width="wrap_content" android:layout_gravity="center_horizontal"
+            android:layout_marginTop="20dp" android:text="@string/txt_changelog"
+            android:textStyle="bold" android:textColor="@color/main"
+            android:textSize="18sp" />
+
+        <TextView android:id="@+id/rate" android:layout_height="wrap_content"
+            android:layout_width="wrap_content" android:layout_gravity="center_horizontal"
+            android:layout_marginTop="20dp" android:text="@string/txt_rate"
+            android:textStyle="bold" android:textColor="@color/main"
+            android:textSize="18sp" />
+
+    </LinearLayout>
 
 </ScrollView>
