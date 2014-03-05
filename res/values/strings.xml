@@ -27,8 +27,9 @@
     <string name="txt_feedback">Send Feedback</string>
     <string name="txt_changelog">Change log</string>
     <string name="txt_rate">Rate the extension</string>
-    <string name="txt_hide_icon">Hide icon from launcher drawer </string>
-    
+    <string name="txt_hide_icon">Hide icon from launcher drawer</string>
+    <string name="txt_sync_read">Sync read (archived) items. Takes longer to sync</string>
+
     <!-- Errors -->
     <string name="err_io">Network error</string>
     

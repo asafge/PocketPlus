@@ -70,6 +70,7 @@ public class WelcomeActivity extends SherlockActivity implements OnClickListener
         findViewById(R.id.rate).setOnClickListener(this);
 
         CheckBox hideIcon = (CheckBox)findViewById(R.id.hide_icon);
+        CheckBox syncReadIcon = (CheckBox)findViewById(R.id.sync_read_icon);
 
         PackageManager p = getPackageManager();
         Intent intent = new Intent(WelcomeActivity.this, WelcomeActivity.class);
@@ -92,6 +93,16 @@ public class WelcomeActivity extends SherlockActivity implements OnClickListener
                     }
                 }
             });
+
+        syncReadIcon.setChecked(Prefs.getSyncRead(getApplicationContext()));
+
+        syncReadIcon.setOnCheckedChangeListener(new OnCheckedChangeListener() {
+
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                Prefs.setSyncRead(getApplicationContext(), isChecked);
+            }
+        });
 	}
 	
 	@Override

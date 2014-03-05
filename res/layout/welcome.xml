@@ -42,8 +42,15 @@
         </LinearLayout>
 
         <CheckBox android:id="@+id/hide_icon" android:layout_height="wrap_content"
-            android:layout_width="wrap_content" android:layout_gravity="center_horizontal"
+            android:layout_width="match_parent" android:layout_gravity="center_horizontal"
             android:text="@string/txt_hide_icon" />
+
+
+        <CheckBox
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/txt_sync_read"
+            android:id="@+id/sync_read_icon" />
 
         <TextView android:id="@+id/changelog" android:layout_height="wrap_content"
             android:layout_width="wrap_content" android:layout_gravity="center_horizontal"
