@@ -27,6 +27,7 @@ import org.apache.http.protocol.HTTP;
 import android.net.SSLCertificateSocketFactory;
 import android.os.Environment;
 import android.text.TextUtils;
+import android.util.Patterns;
 
 
 public class Utils {
@@ -148,5 +149,18 @@ public class Utils {
 
 		return true;
 	}
+
+    // Extract URLs from text containing them
+    public static String extractURL(String args) {
+        String s = args;
+        String [] parts = s.split("\\s");
+        String withURL = "";
+        for (String item : parts) {
+            if (Patterns.WEB_URL.matcher(item).matches()) {
+                return item;
+            }
+        }
+        return withURL;
+    }
 
 }

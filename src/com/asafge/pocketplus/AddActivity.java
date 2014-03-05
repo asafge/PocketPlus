@@ -12,6 +12,7 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.noinnion.android.reader.api.ReaderException;
+import com.asafge.pocketplus.util.Utils;
 
 public class AddActivity extends Activity {
 
@@ -28,7 +29,8 @@ public class AddActivity extends Activity {
 
 	    if (Intent.ACTION_SEND.equals(action) && type != null && "text/plain".equals(type)) {
 			try {
-				URL u = new URL(intent.getStringExtra(Intent.EXTRA_TEXT));
+                String urlStr = Utils.extractURL(intent.getStringExtra(Intent.EXTRA_TEXT));
+				URL u = new URL(urlStr);
 				new AddToPocket().execute(u.toString());
 			}
 			catch (MalformedURLException e) {
