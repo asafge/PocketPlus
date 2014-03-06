@@ -76,7 +76,7 @@ public class PocketPlus extends ReaderExtension {
 				ac.addPostParam("favorite", "1");
 			}
 			else {
-				ac.addPostParam("state", Prefs.getSyncRead(c) ? "all" : "unread");
+				ac.addPostParam("state", "unread");
 			}
 			ac.addPostParam("sort", "newest");
 			ac.addPostParam("detailType", "simple");
