@@ -1,17 +1,16 @@
-PocketPlus (0.2)
-================
+PocketPlus (0.3.2)
+==================
 
 A News+ extension for Pocket.
-This project is in early stages and should be considered as beta.
-
 
 Features
 -------------------------------
-* Authenticate with Pocket.
-* Sync unread stories.
+* Sync unread stories from Pocket using your account.
+* Sync read (archived) stories - optional.
 * Sync favorite (starred) storries.
 * Handle read/unread requests.
-* Support for tagging stories. 
+* Support for tagging stories.
+* Support for adding new links to Pocket.
 
 References
 -------------------------------
