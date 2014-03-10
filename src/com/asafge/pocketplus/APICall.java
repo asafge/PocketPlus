@@ -47,7 +47,7 @@ public class APICall {
 		callback.header("X-Accept", "application/json");
 		callback.header("Content-Type", "application/x-www-form-urlencoded; charset=UTF8");
 		callback.url(callbackUrl).type(JSONObject.class);
-		callback.timeout(5000);
+		callback.timeout(12000);
 		callback.retry(3);
 		callback.method(AQuery.METHOD_POST);
 	}

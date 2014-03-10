@@ -1,4 +1,4 @@
-PocketPlus (0.3.2)
+PocketPlus (0.3.3)
 ==================
 
 A News+ extension for Pocket.
