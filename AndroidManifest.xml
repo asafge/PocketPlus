@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
 	package="com.asafge.pocketplus" android:installLocation="auto"
-	android:versionCode="16" android:versionName="0.3.3">
+	android:versionCode="17" android:versionName="0.4.0">
 
 	<uses-sdk android:minSdkVersion="8" android:targetSdkVersion="20" />
 
@@ -35,6 +35,7 @@
 			<meta-data android:name="description" android:value="@string/extension_description" />
 			<meta-data android:name="loginActivity" android:value=".LoginActivity" />
             <meta-data android:name="settingsActivity" android:value=".SettingsActivity" />
+            <meta-data android:name="extraFeatures" android:value="deletableItem" />
 		</service>
         		
         <activity android:name="com.asafge.pocketplus.LoginActivity"

@@ -330,6 +330,9 @@ public class PocketPlus extends ReaderExtension {
 						if (tags[i].startsWith(StarredTag.get().uid)) { 
 							action_obj.put("action", "favorite");
 						}
+                        else if (tags[i].startsWith(ReaderExtension.STATE_TRASH)) {
+                            action_obj.put("action", "delete");
+                        }
 						else {
 							action_obj.put("action", "tags_add");
 							action_obj.put("tags", new JSONArray().put(tags[i].replace("TAG:", "")));
