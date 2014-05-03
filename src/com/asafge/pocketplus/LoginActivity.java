@@ -43,6 +43,7 @@ public class LoginActivity extends Activity {
 	@Override
 	protected void onResume() {
 		super.onResume();
+        Utils.startAppPackage(this, WelcomeActivity.NEWSPLUS_PACKAGE);
 
 		final Context c = getApplicationContext();
 		if (Prefs.isLoggedIn(c)) {

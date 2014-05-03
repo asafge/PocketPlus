@@ -57,7 +57,8 @@ public class OAuthActivity extends Activity {
 			}
 			catch (ReaderException e) {
 				Prefs.setSessionData(c, null);
-				return false;
+                Log.e("Pocket+ Debug", e.getMessage());
+                return false;
 			}
 		}
 
@@ -75,7 +76,6 @@ public class OAuthActivity extends Activity {
 					StringBuilder builder = new StringBuilder();
 					builder.append(APICall.API_URL_OAUTH_AUTHORIZE_APP).append("?request_token=").append(json.getString("code")).append("&redirect_uri=").append(APICall.API_OAUTH_REDIRECT);
 					
-					Log.e("Test", "request url: " + builder.toString());
 					Intent launchBrowser = new Intent(Intent.ACTION_VIEW, Uri.parse(builder.toString()));
 					launchBrowser.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
 					startActivity(launchBrowser);
@@ -103,7 +103,7 @@ public class OAuthActivity extends Activity {
 	            ac.addPostParam("code", Prefs.getSessionData(c).getString("code"));
 				ac.sync();
 							
-				if (ac.Json.getString("access_token") != "") {
+				if (!ac.Json.getString("access_token").equals("")) {
 					Prefs.setSessionData(c, ac.Json);
 					Prefs.setLoggedIn(c, true);
 					setResult(RESULT_OK);
@@ -112,7 +112,8 @@ public class OAuthActivity extends Activity {
 				else {
 					Prefs.setSessionData(c, null);
 					Prefs.setLoggedIn(c, false);
-					return false;	
+                    Log.e("Pocket+ Debug", ac.Json.toString());
+                    return false;
 				}
 			}
 			catch (JSONException e) {
@@ -124,7 +125,8 @@ public class OAuthActivity extends Activity {
 			catch (ReaderException e) {
 				Prefs.setSessionData(c, null);
 				Prefs.setLoggedIn(c, false);
-				return false;
+                Log.e("Pocket+ Debug", e.getMessage());
+                return false;
 			}
         }
 
